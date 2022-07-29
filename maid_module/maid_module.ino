@@ -20,9 +20,13 @@
 
 // * Default settings and variables needed
 unsigned long time_spent_from_start = 0;
-const byte seconds_btw_transfer = 2; 
+const byte seconds_btwn_transfer = 2; 
+
 Models::Wheel FrontWheel(6, 2070);
-Models::Instruments Multitool;
+Models::BluetoothAdapter HC_06;
+Models::Speedometer Speedometer;
+Models::Voltmeter Voltmeter(5, 5);
+Models::Signaler Signaler;
 
 
 void setup() 
@@ -33,9 +37,9 @@ void setup()
 
 void loop() 
 {
-  if ((millis() - time_spent_from_start) / 1000 == seconds_btw_transfer) 
+  if ((millis() - time_spent_from_start) / 1000 == seconds_btwn_transfer) 
   {
-    Serial.println(Multitool.CreateTransferMessage(60, 50));
+    Serial.println(HC_06.CreateTransferMessage(60, 50));
     time_spent_from_start = millis(); 
   }
 }
