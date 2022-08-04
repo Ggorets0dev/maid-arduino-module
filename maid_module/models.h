@@ -1,32 +1,39 @@
-# pragma once
+#pragma once
+#include "pinout.h"
 #include <Arduino.h>
 
-# define READINGS '#'
-# define COMMAND '$'
 
 namespace Models
 {
-    // * Struct with the appropriate indicators needed to calculate speed and distance
-    struct Wheel
+    // * Wheel used in motorcycle
+    class Wheel
     {
+    private:
         byte count_of_spokes;
         unsigned short wheel_circumference_mm;
+    public:
         Wheel(byte spokes, unsigned short size_mm);
+        byte GetSpokesCount();
+        unsigned short GetWheelCircumference();
     };
 
     // * Provides work with bluetooth connection
     class BluetoothAdapter
     {
     public:
-        String CreateTransferMessage(char prefix, String msg);
-        String CreateTransferMessage(byte speed, byte voltage, char prefix='#');
+        void TransferMessage(char prefix, String msg);
+        void TransferRecords(float speed, float voltage, char prefix='#');
     };
 
     // * Provides work with speed calculation
     class Speedometer
     {
+    private:
+        unsigned short impulse_counter;
     public:
-        float CalculateSpeed(byte time_spent, byte num_of_impulses, Wheel wheel);
+        float CalculateSpeed(byte time_spent_sec, Wheel wheel);
+        void CountImpulse();
+        void ResetCounter();
     };
 
     // * Provides work with voltage calculation
@@ -37,14 +44,16 @@ namespace Models
         byte R2_kohm; // Used in voltage divider
     public:
         Voltmeter(byte r1_kohm, byte r2_kohm);
-        float CalculateVoltage(unsigned short analog_read_result);
+        float CalculateVoltage(int analog_read_result);
     };
 
     // * Provides work with all available signals
     class Signaler
     {
     public:
-        void TurnOnSignal(byte pin);
-        void TurnOffSignal(byte pin);
+        void TurnOnRightSignal();
+        void TurnOffRightSignal();
+        void TurnOnLeftSignal();
+        void TurnOffLeftSignal();
     };
 }
