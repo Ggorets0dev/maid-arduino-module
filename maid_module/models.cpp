@@ -3,9 +3,9 @@
 
 namespace Models
 {
-    Wheel::Wheel(byte spokes, unsigned short size_mm) { count_of_spokes = spokes; wheel_circumference_mm = size_mm; }
+    Wheel::Wheel(byte spokes, ushort size_mm) { count_of_spokes = spokes; wheel_circumference_mm = size_mm; }
     byte Wheel::GetSpokesCount() { return count_of_spokes; }
-    unsigned short Wheel::GetWheelCircumference() { return wheel_circumference_mm; }
+    ushort Wheel::GetWheelCircumference() { return wheel_circumference_mm; }
 
     void BluetoothAdapter::TransferMessage(char prefix, String msg)
     {
@@ -40,5 +40,5 @@ namespace Models
         return vin;
     }
 
-    void Signaler::ManipulateSingleSignal(SignalSide side, SignalInteraction mode) { digitalWrite(side, mode); }
+    void Signaler::ManipulateSingleSignal(Side side, Interaction mode) { digitalWrite(side, mode); }
 }

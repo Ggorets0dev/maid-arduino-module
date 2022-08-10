@@ -1,5 +1,5 @@
 /*
-  Project Name: Maid
+  Project Name: MaidModule
   Package Name: maid-arduino-module
   Developer: Ggorets0dev
   Version: 0.2
@@ -24,10 +24,10 @@ Models::Signaler Signaler;
 
 // * Create interrupt handlers for all available interrupts
 void HandleSpeedometerInterrupt(void) { Speedometer.CountImpulse(); }
-void HandleLeftTurnSignalOn(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Left, Signaler.SignalInteraction::On); }
-void HandleLeftTurnSignalOff(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Left, Signaler.SignalInteraction::Off); }
-void HandleRightTurnSignalOn(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Right, Signaler.SignalInteraction::On); }
-void HandleRightTurnSignalOff(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Right, Signaler.SignalInteraction::Off); }
+void HandleLeftTurnSignalOn(void) { Signaler.ManipulateSingleSignal(Signaler.Side::Left, Signaler.Interaction::On); }
+void HandleLeftTurnSignalOff(void) { Signaler.ManipulateSingleSignal(Signaler.Side::Left, Signaler.Interaction::Off); }
+void HandleRightTurnSignalOn(void) { Signaler.ManipulateSingleSignal(Signaler.Side::Right, Signaler.Interaction::On); }
+void HandleRightTurnSignalOff(void) { Signaler.ManipulateSingleSignal(Signaler.Side::Right, Signaler.Interaction::Off); }
 
 
 void setup() 

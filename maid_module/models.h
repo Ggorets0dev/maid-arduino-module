@@ -53,16 +53,16 @@ namespace Models
     class Signaler
     {
     public:
-        enum SignalSide
+        enum Side
         {
             Right = RIGHT_TURN_LAMP_PIN,
             Left = LEFT_TURN_BUTTON_PIN
         };
-        enum SignalInteraction
+        enum Interaction
         {
             On = HIGH,
             Off = LOW
         };
-        void ManipulateSingleSignal(SignalSide side, SignalInteraction mode);
+        void ManipulateSingleSignal(Side side, Interaction mode);
     };
 }
