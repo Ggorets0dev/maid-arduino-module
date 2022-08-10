@@ -2,6 +2,8 @@
 #include "pinout.h"
 #include <Arduino.h>
 
+typedef unsigned short ushort;
+typedef unsigned long ulong;
 
 namespace Models
 {
@@ -10,11 +12,11 @@ namespace Models
     {
     private:
         byte count_of_spokes;
-        unsigned short wheel_circumference_mm;
+        ushort wheel_circumference_mm;
     public:
-        Wheel(byte spokes, unsigned short size_mm);
+        Wheel(byte spokes, ushort size_mm);
         byte GetSpokesCount();
-        unsigned short GetWheelCircumference();
+        ushort GetWheelCircumference();
     };
 
     // * Provides work with bluetooth connection
@@ -29,7 +31,7 @@ namespace Models
     class Speedometer
     {
     private:
-        unsigned short impulse_counter;
+        ushort impulse_counter;
     public:
         float CalculateSpeed(byte time_spent_sec, Wheel wheel);
         void CountImpulse();
@@ -51,9 +53,16 @@ namespace Models
     class Signaler
     {
     public:
-        void TurnOnRightSignal();
-        void TurnOffRightSignal();
-        void TurnOnLeftSignal();
-        void TurnOffLeftSignal();
+        enum SignalSide
+        {
+            Right = RIGHT_TURN_LAMP_PIN,
+            Left = LEFT_TURN_BUTTON_PIN
+        };
+        enum SignalInteraction
+        {
+            On = HIGH,
+            Off = LOW
+        };
+        void ManipulateSingleSignal(SignalSide side, SignalInteraction mode);
     };
 }

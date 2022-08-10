@@ -2,7 +2,7 @@
   Project Name: Maid
   Package Name: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.1
+  Version: 0.2
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
@@ -12,10 +12,10 @@
 
 
 // * Default settings and variables needed
-unsigned long time_spent_from_start = 0;
+ulong time_spent_from_start = 0;
 const byte seconds_btwn_transfer = 2; 
 
-Models::Wheel FrontWheel(6, 2070);
+const Models::Wheel FrontWheel(6, 2070);
 Models::BluetoothAdapter HC_06;
 Models::Speedometer Speedometer;
 Models::Voltmeter Voltmeter(10, 100);
@@ -24,10 +24,10 @@ Models::Signaler Signaler;
 
 // * Create interrupt handlers for all available interrupts
 void HandleSpeedometerInterrupt(void) { Speedometer.CountImpulse(); }
-void HandleLeftTurnSignalOn(void) { Signaler.TurnOnLeftSignal();  }
-void HandleLeftTurnSignalOff(void) { Signaler.TurnOffLeftSignal(); }
-void HandleRightTurnSignalOn(void) { Signaler.TurnOnRightSignal(); }
-void HandleRightTurnSignalOff(void) { Signaler.TurnOffRightSignal(); }
+void HandleLeftTurnSignalOn(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Left, Signaler.SignalInteraction::On); }
+void HandleLeftTurnSignalOff(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Left, Signaler.SignalInteraction::Off); }
+void HandleRightTurnSignalOn(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Right, Signaler.SignalInteraction::On); }
+void HandleRightTurnSignalOff(void) { Signaler.ManipulateSingleSignal(Signaler.SignalSide::Right, Signaler.SignalInteraction::Off); }
 
 
 void setup() 
@@ -40,7 +40,7 @@ void setup()
   attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), HandleRightTurnSignalOn, RISING);
   attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), HandleRightTurnSignalOff, FALLING);
 
-  attachPCINT(digitalPinToPCINT(SPEEDOMETER_PIN), HandleSpeedometerInterrupt, FALLING);
+  attachInterrupt(SPEEDOMETER_PIN, HandleSpeedometerInterrupt, FALLING);
 }
 
 void loop() 

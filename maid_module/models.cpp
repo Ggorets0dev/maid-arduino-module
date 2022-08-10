@@ -40,8 +40,5 @@ namespace Models
         return vin;
     }
 
-    void Signaler::TurnOnRightSignal() { digitalWrite(RIGHT_TURN_LAMP_PIN, HIGH); }
-    void Signaler::TurnOffRightSignal() { digitalWrite(RIGHT_TURN_LAMP_PIN, LOW); }
-    void Signaler::TurnOnLeftSignal() { digitalWrite(LEFT_TURN_LAMP_PIN, HIGH); }
-    void Signaler::TurnOffLeftSignal() { digitalWrite(LEFT_TURN_LAMP_PIN, LOW); }
+    void Signaler::ManipulateSingleSignal(SignalSide side, SignalInteraction mode) { digitalWrite(side, mode); }
 }

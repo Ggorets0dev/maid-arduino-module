@@ -4,3 +4,15 @@ The **Maid** *(Motorcycle Auxiliary Information Device)* module on the arduino, 
 <p align='center'>
        <img height=275 src="materials/Maid_Logo.png"/>
 </p>
+
+
+## Structure
+---
+### **Connecting Principle**
+
+MaidModule communicates with the MaidApp via Bluetooth. **HC-06** bluetooth module is responsible for communication.
+
+
+### **Types of messages (Sent/Received)**
+
+You can find a table with all the possible messages on the MaidApp [markdown file](https://github.com/Ggorets0dev/maid-android-application/blob/master/README.md) in the section **Types of messages (Sent/Received)**.
