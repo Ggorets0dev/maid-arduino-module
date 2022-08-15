@@ -1,3 +1,5 @@
+#pragma once
+
 // * Analog pins used:
 #define VOLTMETER_PIN 0 
 

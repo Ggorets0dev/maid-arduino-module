@@ -1,5 +1,6 @@
 #pragma once
 #include "pinout.h"
+#include "transfer_prefixes.h"
 #include <Arduino.h>
 
 typedef unsigned short ushort;
@@ -23,8 +24,8 @@ namespace Models
     class BluetoothAdapter
     {
     public:
-        void TransferMessage(char prefix, String msg);
-        void TransferRecords(float speed, float voltage, char prefix='#');
+        void TransferMessage(String msg, char prefix=READINGS_PREFIX);
+        void TransferRecords(float speed, float voltage, char prefix=READINGS_PREFIX);
     };
 
     // * Provides work with speed calculation
