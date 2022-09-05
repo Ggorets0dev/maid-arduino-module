@@ -2,7 +2,7 @@
 Module based on the Arduino, which collects motorcycle data and partially controls peripherals. It is controlled by a special [MaidApp](https://github.com/Ggorets0dev/maid-android-application) *(Motorcycle Auxiliary Information Device)* written for Android.
 
 <p align='center'>
-       <img height=275 src="materials/Maid_Logo.png"/>
+       <img height=400 src="materials/Maid_Logo.png"/>
 </p>
 
 
