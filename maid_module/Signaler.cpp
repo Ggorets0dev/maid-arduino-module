@@ -1,9 +1,6 @@
-#include "models.h"
+#include "devices.h"
 
-namespace Models
-{
-    void Signaler::ManipulateSingleSignal(Side side, Interaction mode) 
-    { 
-        digitalWrite(side, mode); 
-    }
+void Signaler::ManipulateSingleSignal(Side side, Interaction mode) 
+{ 
+    digitalWrite(side, mode); 
 }
