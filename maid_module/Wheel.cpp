@@ -2,8 +2,8 @@
 
 Wheel::Wheel(byte spokes, uint size_mm)
 { 
-    count_of_spokes = spokes; 
-    wheel_circumference_mm = size_mm; 
+    this->count_of_spokes = spokes; 
+    this->wheel_circumference_mm = size_mm; 
 }
 
 byte Wheel::GetSpokesCount() 

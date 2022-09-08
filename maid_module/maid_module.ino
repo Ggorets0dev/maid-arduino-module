@@ -1,10 +1,13 @@
 /*
-  Project Name: MaidModule
-  Repository Name: maid-arduino-module
+  Project Title: MaidModule
+  Repository Title: maid-arduino-module
   Developer: Ggorets0dev
   Version: 0.5
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
+
+#define VERSION "0.5"
+
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -18,7 +21,6 @@
 ulong time_since_launch_ms = 0;
 byte msg_buffer[20];
 
-const String VERSION = "0.5";
 const byte SENSORS_READINGS_TRANSFER_DELAY_SEC = 2;
 const uint BAUD = 9600; 
 

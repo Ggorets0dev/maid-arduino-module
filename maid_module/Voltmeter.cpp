@@ -2,8 +2,8 @@
 
 Voltmeter::Voltmeter(byte r1_kohm, byte r2_kohm) 
 { 
-    R1_kohm = r1_kohm; 
-    R2_kohm = r2_kohm; 
+    this->R1_kohm = r1_kohm; 
+    this->R2_kohm = r2_kohm; 
 }
 
 float Voltmeter::CalculateVoltage(int analog_read_result)
