@@ -9,7 +9,7 @@
 class BluetoothAdapter
 {
 public:
-    static void TransferMessage(Message msg);
+    static void TransferMessage(Message &msg);
 };
 
 // * Provides work with speed calculation
@@ -18,7 +18,8 @@ class Speedometer
 private:
     uint impulse_counter;
 public:
-    float CalculateSpeed(byte time_spent_sec, Wheel wheel);
+    Speedometer(int counter);
+    float CalculateSpeed(byte time_spent_sec, Wheel &wheel);
     void CountImpulse();
     void ResetCounter();
 };

@@ -19,16 +19,16 @@ public:
     };
     enum MessageCodes
     {
-        GetSensorReadings = 0,
-        GetModuleVersion = 1,
-        SendModuleVersion = 2,
-        TurnLeftEnable = 3,
-        TurnRightEnable = 4,
-        TurnsDisable = 5,
-        EmptyCode = 6
+        EmptyCode = 0,
+        SendSensorReadings = 1,
+        GetModuleVersion = 2,
+        SendModuleVersion = 3,
+        EnableLeftTurn = 4,
+        EnableRightTurn = 5,
+        DisableTurns = 6
     };
 
-    static bool IsRequest(Message msg);
-    static bool IsResponse(Message msg);
-    static bool IsCodeMatch(Message msg, MessageCodes code);
+    static bool IsRequest(Message &msg);
+    static bool IsResponse(Message &msg);
+    static bool IsCodeMatch(Message &msg, MessageCodes code);
 };

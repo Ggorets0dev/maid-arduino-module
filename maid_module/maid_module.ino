@@ -1,12 +1,12 @@
 /*
-  Project Title: MaidModule
-  Repository Title: maid-arduino-module
+  Project: MaidModule
+  Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.5
+  Version: 0.5.1
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define VERSION "0.5"
+#define __MODULE_VERSION__ "0.5.1"
 
 
 #include <Arduino.h>
@@ -19,15 +19,15 @@
 
 
 ulong time_since_launch_ms = 0;
-byte msg_buffer[20];
+byte msg_byte_buffer[20];
 
 const byte SENSORS_READINGS_TRANSFER_DELAY_SEC = 2;
 const uint BAUD = 9600; 
 
 Wheel FrontWheel(6, 2070);
 Voltmeter VoltageSensor(10, 100);
-Speedometer SpeedSensor;
-Message msg_recived;
+Speedometer SpeedSensor(0);
+Message msg_temp;
 
 
 // * Creating interrupt handlers for all available interrupts
@@ -41,6 +41,8 @@ void HandleRightTurnSignMakerOff(void) { Signaler::ManipulateSingleSignal(Signal
 void setup() 
 {
     Serial.begin(BAUD);
+
+    // randomSeed(analogRead(0)); For testing readings transfering
 
     pinMode(SPEEDOMETER_PIN, INPUT_PULLUP);
     pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);
@@ -57,9 +59,14 @@ void setup()
 
 void loop() 
 {
-    if ((millis() - time_since_launch_ms) / 1000 == SENSORS_READINGS_TRANSFER_DELAY_SEC) 
+    if ((millis() - time_since_launch_ms) / 1000 >= SENSORS_READINGS_TRANSFER_DELAY_SEC) 
     {
-        BluetoothAdapter::TransferMessage(Message(SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel), VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN))));
+        //msg_temp = Message((float)random(99), (float)random(99)); For testing readings transfering
+
+        msg_temp =  Message(SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel), VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN)));
+        
+        BluetoothAdapter::TransferMessage(msg_temp);
+        
         SpeedSensor.ResetCounter(); 
 
         time_since_launch_ms = millis();
@@ -67,13 +74,16 @@ void loop()
 
     if (Serial.available())
     {
-        Serial.readBytes(msg_buffer, sizeof(msg_buffer));
-        msg_recived = Message(String((char*)msg_buffer));
-        memset(msg_buffer, 0, sizeof(msg_buffer));
+        Serial.readBytes(msg_byte_buffer, sizeof(msg_byte_buffer));
+        msg_temp = Message(String((char*)msg_byte_buffer));
+        memset(msg_byte_buffer, 0, sizeof(msg_byte_buffer));
 
-        Serial.println(msg_recived.ToString());
+        Serial.println(msg_temp.ToString());
 
-        if (MessageAnalyzer::IsRequest(msg_recived) && MessageAnalyzer::IsCodeMatch(msg_recived, MessageAnalyzer::MessageCodes::GetModuleVersion))
-            Serial.println(Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, VERSION).ToString());
+        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetModuleVersion))
+        {
+            msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
+            BluetoothAdapter::TransferMessage(msg_temp);
+        }
     }
 }

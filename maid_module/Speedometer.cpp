@@ -1,5 +1,10 @@
 #include "devices.h"
 
+Speedometer::Speedometer(int counter)
+{
+    this->impulse_counter = counter;
+}
+
 void Speedometer::CountImpulse() 
 { 
     impulse_counter++; 
@@ -10,7 +15,7 @@ void Speedometer::ResetCounter()
     impulse_counter = 0; 
 }
 
-float Speedometer::CalculateSpeed(byte time_spent_sec, Wheel wheel)
+float Speedometer::CalculateSpeed(byte time_spent_sec, Wheel &wheel)
 {
     if (impulse_counter == 0) return 0.0;
     else 

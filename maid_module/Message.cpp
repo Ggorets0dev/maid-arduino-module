@@ -17,7 +17,7 @@ Message::Message(char prefix, int code, String data)
 Message::Message(float speed, float voltage)
 {
     this->prefix = MessageAnalyzer::MessagePrefixes::Response;
-    this->code = MessageAnalyzer::MessageCodes::GetSensorReadings;
+    this->code = MessageAnalyzer::MessageCodes::SendSensorReadings;
     this->data = String(speed, 2) + "_" + String(voltage, 2);
 }
 
@@ -31,17 +31,17 @@ Message::Message()
 
 int Message::GetCode()
 { 
-    return code;
+    return this->code;
 }
 
 char Message::GetPrefix()
 {
-    return prefix;
+    return this->prefix;
 }
 
 String Message::GetData()
 {
-    return data;
+    return this->data;
 }
 
 String Message::ToString()
