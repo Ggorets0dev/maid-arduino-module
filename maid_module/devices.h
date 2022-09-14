@@ -18,7 +18,7 @@ class Speedometer
 private:
     uint impulse_counter;
 public:
-    Speedometer(int counter);
+    Speedometer(uint counter);
     float CalculateSpeed(byte time_spent_sec, Wheel &wheel);
     void CountImpulse();
     void ResetCounter();
@@ -38,16 +38,18 @@ public:
 // * Provides work with all available signals
 class Signaler
 {
+private:
+    bool IsLeftTurnEnabled;
+    bool IsRightTurnEnabled;
 public:
     enum Side
     {
         Right = RIGHT_TURN_LAMP_PIN,
         Left = LEFT_TURN_BUTTON_PIN
     };
-    enum Interaction
-    {
-        On = HIGH,
-        Off = LOW
-    };
-    static void ManipulateSingleSignal(Side side, Interaction mode);
+    
+    Signaler(bool left_turn_mode, bool right_turn_mode);
+    bool IsEnabled(Side side);
+    void EnableTurn(Side side);
+    void DisableTurn(Side side);
 };

@@ -1,6 +1,6 @@
 #include "devices.h"
 
-Speedometer::Speedometer(int counter)
+Speedometer::Speedometer(uint counter)
 {
     this->impulse_counter = counter;
 }

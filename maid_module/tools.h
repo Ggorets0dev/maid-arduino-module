@@ -21,11 +21,13 @@ public:
     {
         EmptyCode = 0,
         SendSensorReadings = 1,
-        GetModuleVersion = 2,
-        SendModuleVersion = 3,
-        EnableLeftTurn = 4,
-        EnableRightTurn = 5,
-        DisableTurns = 6
+        StartSensorReadings = 2,
+        StopSensorReadings = 3,
+        GetModuleVersion = 4,
+        SendModuleVersion = 5,
+        EnableLeftTurn = 6,
+        EnableRightTurn = 7,
+        DisableTurns = 8
     };
 
     static bool IsRequest(Message &msg);
