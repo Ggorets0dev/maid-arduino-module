@@ -6,6 +6,7 @@ Voltmeter::Voltmeter(byte r1_kohm, byte r2_kohm)
     this->R2_kohm = r2_kohm; 
 }
 
+// * Calculate voltage using readings from analog arduino port
 float Voltmeter::CalculateVoltage(int analog_read_result)
 {
     float vout = ((float)analog_read_result * 5.0) / 1024.0;

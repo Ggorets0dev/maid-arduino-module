@@ -25,7 +25,7 @@ Message::Message()
 {
     this->prefix = MessageAnalyzer::MessagePrefixes::EmptyPrefix;
     this->code = MessageAnalyzer::MessageCodes::EmptyCode;
-    this->data = "";
+    this->data = EMPTY_STRING;
 }
 
 

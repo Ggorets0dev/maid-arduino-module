@@ -35,12 +35,14 @@ public:
     float CalculateVoltage(int analog_read_result);
 };
 
-// * Provides work with all available signals
+// * Provides work with left and right back signals
 class Signaler
 {
 private:
     bool IsLeftTurnEnabled;
     bool IsRightTurnEnabled;
+	uint LeftTurnMillis;
+	uint RightTurnMillis;
 public:
     enum Side
     {
