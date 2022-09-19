@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.6.1
+  Version: 0.6.1(E1)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.6.1"
+#define __MODULE_VERSION__ "0.6.1(E1)"
 
 
 #include <Arduino.h>
@@ -17,19 +17,28 @@
 #include "devices.h"
 #include "tools.h"
 
-
+// * Variables-buffers for temporary storage
+float measured_speed;
+float measured_voltage;
 ulong time_since_launch_ms = 0;
 byte msg_byte_buffer[20];
+bool SendReadings = true;
+Message msg_temp;
+class Node* head;
 
+// * Technical constants required for the application
 const byte SENSORS_READINGS_TRANSFER_DELAY_SEC = 2;
-const uint BAUD = 9600;
-bool SendReadings = true; 
+const uint BAUD = 9600; 
 
+// * Settings of linked list with sensor readings
+uint Node::max_node_cnt = 10;    // ! Memory consumption is directly related to this amount
+uint Node::node_cnt = 0;        // ! Must be 0 for correct start of sketch
+
+// * Initialization of all classes-devices required for work
 Wheel FrontWheel(6, 2070);
 Voltmeter VoltageSensor(10, 100);
 Speedometer SpeedSensor(0);
 Signaler Signal(false, false);
-Message msg_temp;
 
 
 // * Creating interrupt handlers for all available interrupts
@@ -44,7 +53,7 @@ void setup()
 {
     Serial.begin(BAUD);
 
-    // randomSeed(analogRead(0)); For testing readings transfering
+    // randomSeed(analogRead(0)); // For testing readings transfering
 
     pinMode(SPEEDOMETER_PIN, INPUT_PULLUP);
     pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);
@@ -63,11 +72,26 @@ void loop()
 {
     if (((millis() - time_since_launch_ms) / 1000 >= SENSORS_READINGS_TRANSFER_DELAY_SEC) && (SendReadings == true)) 
     {
-        //msg_temp = Message((float)random(99), (float)random(99)); For testing readings transfering
+        //msg_temp = Message((float)random(99), (float)random(99)); // For testing readings transfering
 
-        msg_temp =  Message(SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel), VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN)));
+        measured_speed = SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel);
+        measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
+
+        if (Node::node_cnt == 0)
+            head = Node::CreateHead(measured_speed, measured_voltage);
+
+        else if (Node::node_cnt >= Node::max_node_cnt)
+        {
+            Serial.println("Got all!");
+            Node::DeleteAllNodes(head);
+        }
         
-        BluetoothAdapter::TransferMessage(msg_temp);
+        else
+            Node::InsertNode(head, measured_speed, measured_voltage);
+
+        msg_temp =  Message(measured_speed, measured_voltage);
+
+        // BluetoothAdapter::TransferMessage(msg_temp);
         
         SpeedSensor.ResetCounter(); 
 

@@ -10,6 +10,22 @@
 class MessageAnalyzer;
 
 
+// * Node of linked list with sensor readings
+class Node
+{
+public:
+    static uint node_cnt;
+    static uint max_node_cnt;
+	float speed_kmh;
+	float voltage_v;
+	class Node* next;
+
+	Node(float speed, float voltage);
+	static class Node* CreateHead(float speed, float voltage);
+	static void InsertNode(class Node* head, float speed, float voltage);
+	static void DeleteAllNodes(class Node* head);
+};
+
 // * Message which can be sent/recieved using bluetooth
 class Message
 {
