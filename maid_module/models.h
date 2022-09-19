@@ -18,6 +18,7 @@ public:
     static uint max_node_cnt;
 	float speed_kmh;
 	float voltage_v;
+    ulong time;
 	class Node* next;
 
 	Node(float speed, float voltage);

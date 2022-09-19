@@ -4,6 +4,7 @@ Node::Node(float speed, float voltage)
 {
 	this->speed_kmh = speed;
 	this->voltage_v = voltage;
+    this->time = millis();
 	this->next = NULL;
 }
 
