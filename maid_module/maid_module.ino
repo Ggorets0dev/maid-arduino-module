@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.6.1(E2)
+  Version: 0.6.1(E3)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.6.1(E2)"
+#define __MODULE_VERSION__ "0.6.1(E3)"
 
 
 #include <Arduino.h>
@@ -20,7 +20,8 @@
 // * Variables-buffers for temporary storage
 float measured_speed;
 float measured_voltage;
-ulong time_since_launch_ms = 0;
+ulong time_transfer_readings_ms = 0;
+ulong time_save_readings_ms = 0;
 byte msg_byte_buffer[20];
 bool SendReadings = true;
 Message msg_temp;
@@ -28,6 +29,7 @@ class Node* head;
 
 // * Technical constants required for the application
 const byte SENSORS_READINGS_TRANSFER_DELAY_SEC = 2;
+const float SENSORS_READINGS_SAVE_DELAY_SEC = 0.5;
 const uint BAUD = 9600; 
 
 // * Settings of linked list with sensor readings
@@ -70,16 +72,14 @@ void setup()
 
 void loop() 
 {
-    if (((millis() - time_since_launch_ms) / 1000 >= SENSORS_READINGS_TRANSFER_DELAY_SEC) && (SendReadings == true)) 
+    if ((((float)millis() - (float)time_save_readings_ms) / 1000.0) >= SENSORS_READINGS_SAVE_DELAY_SEC)
     {
-        //msg_temp = Message((float)random(99), (float)random(99)); // For testing readings transfering
-
         measured_speed = SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
 
         if (Node::node_cnt == 0)
             head = Node::CreateHead(measured_speed, measured_voltage);
-
+            
         else if (Node::node_cnt >= Node::max_node_cnt)
         {
             Serial.println("Got all!");
@@ -89,13 +89,21 @@ void loop()
         else
             Node::InsertNode(head, measured_speed, measured_voltage);
 
+        SpeedSensor.ResetCounter(); 
+        time_save_readings_ms = millis();
+    }
+
+    if (((millis() - time_transfer_readings_ms) / 1000 >= SENSORS_READINGS_TRANSFER_DELAY_SEC) && (SendReadings == true)) 
+    {
+        measured_speed = SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel);
+        measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
+
         msg_temp =  Message(measured_speed, measured_voltage);
 
-        // BluetoothAdapter::TransferMessage(msg_temp);
+        BluetoothAdapter::TransferMessage(msg_temp);
         
         SpeedSensor.ResetCounter(); 
-
-        time_since_launch_ms = millis();
+        time_transfer_readings_ms = millis();
     }
 
     if (Serial.available())

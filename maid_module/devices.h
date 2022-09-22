@@ -20,6 +20,7 @@ private:
 public:
     Speedometer(uint counter);
     float CalculateSpeed(byte time_spent_sec, Wheel &wheel);
+    float CalculateAverageSpeed(class Node* head);
     void CountImpulse();
     void ResetCounter();
 };

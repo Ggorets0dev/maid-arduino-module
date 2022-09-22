@@ -27,3 +27,12 @@ float Speedometer::CalculateSpeed(byte time_spent_sec, Wheel &wheel)
         return speed_kmh;
     }
 }
+
+// * Calculates the average speed over the elapsed time between nodes
+float CalculateAverageSpeed(class Node* head)
+{
+    float speed_average = 0.0;
+    float speed_sum = 0.0;
+    float time_sum = 0.0;
+    return speed_average;
+}
