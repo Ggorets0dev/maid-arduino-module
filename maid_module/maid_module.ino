@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.0
+  Version: 0.7.1
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.0"
+#define __MODULE_VERSION__ "0.7.1"
 
 
 #include <Arduino.h>
@@ -22,10 +22,10 @@ float measured_speed;
 float measured_voltage;
 ulong time_transfer_readings_ms = 0;
 ulong time_save_readings_ms = 0;
-byte msg_byte_buffer[20];
+byte msg_byte_buffer[Message::maximal_message_length];
 bool SendReadings = true;
 Message msg_temp;
-class Node* head;
+Node* head;
 
 // * Technical constants required for the application
 const byte SENSORS_READINGS_TRANSFER_DELAY_SEC = 2;
@@ -34,7 +34,7 @@ const uint BAUD = 9600;
 
 // * Settings of linked list with sensor readings
 uint Node::max_node_cnt = 10;    // ! Memory consumption is directly related to this amount
-uint Node::node_cnt = 0;        // ! Must be 0 for correct start of sketch
+uint Node::node_cnt = 0;         // ! Must be 0 for correct start of sketch
 
 // * Initialization of all classes-devices required for work
 Wheel FrontWheel(6, 2070);

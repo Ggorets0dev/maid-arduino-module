@@ -8,17 +8,17 @@ Node::Node(float speed, float voltage)
 	this->next = NULL;
 }
 
-class Node* Node::CreateHead(float speed, float voltage)
+Node* Node::CreateHead(float speed, float voltage)
 {
-	class Node* head = new Node(speed, voltage);
+	Node* head = new Node(speed, voltage);
     node_cnt++;
 	return head;
 }
 
-void Node::InsertNode(class Node* head, float speed, float voltage)
+void Node::InsertNode(Node* head, float speed, float voltage)
 {    
-	class Node* current = head;
-	class Node* node_to_insert = new Node(speed, voltage);
+	Node* current = head;
+	Node* node_to_insert = new Node(speed, voltage);
 
 	while (current->next != NULL)
 		current = current->next;
@@ -30,10 +30,10 @@ void Node::InsertNode(class Node* head, float speed, float voltage)
 	node_to_insert = NULL;
 }
 
-void Node::DeleteAllNodes(class Node* head)
+void Node::DeleteAllNodes(Node* head)
 {
-	class Node* current = head;
-	class Node* to_delete;
+	Node* current = head;
+	Node* to_delete;
 
 	while (current != NULL)
 	{

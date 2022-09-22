@@ -19,12 +19,12 @@ public:
 	float speed_kmh;
 	float voltage_v;
     ulong time;
-	class Node* next;
+	Node* next;
 
 	Node(float speed, float voltage);
-	static class Node* CreateHead(float speed, float voltage);
-	static void InsertNode(class Node* head, float speed, float voltage);
-	static void DeleteAllNodes(class Node* head);
+	static Node* CreateHead(float speed, float voltage);
+	static void InsertNode(Node* head, float speed, float voltage);
+	static void DeleteAllNodes(Node* head);
 };
 
 // * Message which can be sent/recieved using bluetooth
@@ -35,6 +35,7 @@ private:
     int code;
     String data;
 public:
+    static const uint maximal_message_length = 20;
     Message(String msg);
     Message(char prefix, int code, String data);
     Message(float speed, float voltage);

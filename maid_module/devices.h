@@ -18,9 +18,9 @@ class Speedometer
 private:
     uint impulse_counter;
 public:
-    Speedometer(uint counter);
+    Speedometer(uint impulse_cnt);
     float CalculateSpeed(byte time_spent_sec, Wheel &wheel);
-    float CalculateAverageSpeed(class Node* head);
+    float CalculateAverageSpeed(Node* head);
     void CountImpulse();
     void ResetCounter();
 };
