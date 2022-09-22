@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.1
+  Version: 0.7.2
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.1"
+#define __MODULE_VERSION__ "0.7.2"
 
 
 #include <Arduino.h>
@@ -28,8 +28,8 @@ Message msg_temp;
 Node* head;
 
 // * Technical constants required for the application
-const byte SENSORS_READINGS_TRANSFER_DELAY_SEC = 2;
-const float SENSORS_READINGS_SAVE_DELAY_SEC = 0.5;
+Repeater SendReadingsRepeater(2.0);
+Repeater SaveReadingsRepeater(0.5);
 const uint BAUD = 9600; 
 
 // * Settings of linked list with sensor readings
@@ -72,9 +72,9 @@ void setup()
 
 void loop() 
 {
-    if ((((float)millis() - (float)time_save_readings_ms) / 1000.0) >= SENSORS_READINGS_SAVE_DELAY_SEC)
+    if (SaveReadingsRepeater.IsPassed())
     {
-        measured_speed = SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel);
+        measured_speed = SpeedSensor.CalculateSpeed(0.5, FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
 
         if (Node::node_cnt == 0)
@@ -90,12 +90,12 @@ void loop()
             Node::InsertNode(head, measured_speed, measured_voltage);
 
         SpeedSensor.ResetCounter(); 
-        time_save_readings_ms = millis();
+        SaveReadingsRepeater.ResetTime();
     }
 
-    if (((millis() - time_transfer_readings_ms) / 1000 >= SENSORS_READINGS_TRANSFER_DELAY_SEC) && (SendReadings == true)) 
+    if (SendReadingsRepeater.IsPassed() && SendReadings) 
     {
-        measured_speed = SpeedSensor.CalculateSpeed(SENSORS_READINGS_TRANSFER_DELAY_SEC, FrontWheel);
+        measured_speed = SpeedSensor.CalculateSpeed(2.0, FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
 
         msg_temp =  Message(measured_speed, measured_voltage);
@@ -103,7 +103,7 @@ void loop()
         BluetoothAdapter::TransferMessage(msg_temp);
         
         SpeedSensor.ResetCounter(); 
-        time_transfer_readings_ms = millis();
+        SendReadingsRepeater.ResetTime();
     }
 
     if (Serial.available())

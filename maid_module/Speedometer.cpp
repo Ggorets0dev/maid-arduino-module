@@ -18,15 +18,12 @@ void Speedometer::ResetCounter()
 }
 
 // * Calculate speed with spoke count and time elapsed, parameters of wheel needed
-float Speedometer::CalculateSpeed(byte time_spent_sec, Wheel &wheel)
+float Speedometer::CalculateSpeed(float time_spent_sec, Wheel &wheel)
 {
     if (impulse_counter == 0) 
         return 0.0;
     else 
-    {
-        float speed_kmh = ((float)impulse_counter / (float)wheel.GetSpokesCount() * (float)wheel.GetWheelCircumference() / 1000000) * (60 * 60 / (float)time_spent_sec);
-        return speed_kmh;
-    }
+        return ((float)impulse_counter / (float)wheel.GetSpokesCount() * (float)wheel.GetWheelCircumference() / 1000000) * (60 * 60 / time_spent_sec);
 }
 
 // * Calculates the average speed over the elapsed time between nodes

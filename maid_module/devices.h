@@ -19,7 +19,7 @@ private:
     uint impulse_counter;
 public:
     Speedometer(uint impulse_cnt);
-    float CalculateSpeed(byte time_spent_sec, Wheel &wheel);
+    float CalculateSpeed(float time_spent_sec, Wheel &wheel);
     float CalculateAverageSpeed(Node* head);
     void CountImpulse();
     void ResetCounter();

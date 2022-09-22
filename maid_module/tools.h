@@ -1,6 +1,7 @@
 #pragma once
 
 #include "models.h"
+#include "typedefs.h"
 
 
 // ! Declaring classes from other header files in advance
@@ -33,4 +34,15 @@ public:
     static bool IsRequest(Message &msg);
     static bool IsResponse(Message &msg);
     static bool IsCodeMatch(Message &msg, MessageCodes code);
+};
+
+class Repeater
+{
+private:
+    ulong time_from_repeat_ms;
+    float repetition_time_sec;
+public:
+    Repeater(float repetition_time_sec);
+    bool IsPassed();
+    void ResetTime();
 };
