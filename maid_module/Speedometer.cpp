@@ -1,5 +1,6 @@
 #include "devices.h"
 
+// * Creatings speedometer with initial impusle count
 Speedometer::Speedometer(uint impulse_cnt)
 {
     this->impulse_counter = impulse_cnt;

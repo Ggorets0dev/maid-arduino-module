@@ -1,5 +1,6 @@
 #include "devices.h"
 
+// * Creating voltmeter class with initial R values
 Voltmeter::Voltmeter(byte r1_kohm, byte r2_kohm) 
 { 
     this->R1_kohm = r1_kohm; 

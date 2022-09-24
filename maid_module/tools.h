@@ -36,6 +36,7 @@ public:
     static bool IsCodeMatch(Message &msg, MessageCodes code);
 };
 
+// * Create delay between same commands
 class Repeater
 {
 private:
@@ -43,6 +44,7 @@ private:
     float repetition_time_sec;
 public:
     Repeater(float repetition_time_sec);
+    float GetRepeatTime();
     bool IsPassed();
     void ResetTime();
 };
