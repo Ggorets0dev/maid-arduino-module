@@ -37,13 +37,13 @@ public:
 };
 
 // * Create delay between same commands
-class Repeater
+class Timer
 {
 private:
     ulong time_from_repeat_ms;
     float repetition_time_sec;
 public:
-    Repeater(float repetition_time_sec);
+    Timer(float repetition_time_sec);
     float GetRepeatTime();
     bool IsPassed();
     void ResetTime();

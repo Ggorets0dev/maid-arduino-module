@@ -23,8 +23,8 @@ public:
 
 	Node(float speed, float voltage);
 	static Node* CreateHead(float speed, float voltage);
-	static void InsertNode(Node* head, float speed, float voltage);
-	static void DeleteAllNodes(Node* head);
+	static void Insert(Node* head, float speed, float voltage);
+	static void DeleteAll(Node* head);
 };
 
 // * Message which can be sent/recieved using bluetooth

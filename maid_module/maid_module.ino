@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.3
+  Version: 0.7.4
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.3"
+#define __MODULE_VERSION__ "0.7.4"
 
 
 #include <Arduino.h>
@@ -20,17 +20,15 @@
 // * Variables-buffers for temporary storage
 float measured_speed;
 float measured_voltage;
-ulong time_transfer_readings_ms = 0;
-ulong time_save_readings_ms = 0;
 byte msg_byte_buffer[Message::maximal_message_length];
-bool SendReadings = true;
 Message msg_temp;
 Node* head;
 
-// * Technical constants required for the application
-Repeater SendReadingsRepeater(2.0);
-Repeater SaveReadingsRepeater(0.5);
+// * Technical vars required for the application
+Timer SendReadingsTimer(2.0f);
+Timer SaveReadingsTimer(0.5f);
 const uint BAUD = 9600; 
+bool SendReadings = true;
 
 // * Settings of linked list with sensor readings
 uint Node::max_node_cnt = 10;    // ! Memory consumption is directly related to this amount
@@ -39,16 +37,16 @@ uint Node::node_cnt = 0;         // ! Must be 0 for correct start of sketch
 // * Initialization of all classes-devices required for work
 Wheel FrontWheel(8, 2070);
 Voltmeter VoltageSensor(10, 100);
-Speedometer SendReadingsSensor(0);
-Speedometer SaveReadingsSensor(0);
+Speedometer SendSpeedSensor(0);
+Speedometer SaveSpeedSensor(0);
 Signaler Signal(false, false);
 
 
 // * Creating interrupt handlers for all available interrupts
 void HandleSpeedometer(void) 
 { 
-    SendReadingsSensor.CountImpulse();
-    SaveReadingsSensor.CountImpulse();
+    SendSpeedSensor.CountImpulse();
+    SaveSpeedSensor.CountImpulse();
 }
 void HandleLeftTurnOn(void) { Signal.EnableTurn(Signaler::Side::Left); }
 void HandleLeftTurnOff(void) { Signal.DisableTurn(Signaler::Side::Left); }
@@ -77,38 +75,38 @@ void setup()
 
 void loop() 
 {
-    if (SaveReadingsRepeater.IsPassed())
+    if (SaveReadingsTimer.IsPassed())
     {
-        measured_speed = SaveReadingsSensor.CalculateSpeed(SaveReadingsRepeater.GetRepeatTime(), FrontWheel);
+        measured_speed = SaveSpeedSensor.CalculateSpeed(SaveReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
 
         if (Node::node_cnt == 0)
             head = Node::CreateHead(measured_speed, measured_voltage);
         
         else
-            Node::InsertNode(head, measured_speed, measured_voltage);
+            Node::Insert(head, measured_speed, measured_voltage);
 
         if (Node::node_cnt >= Node::max_node_cnt)
         {
             Serial.println("Got all!");
-            Node::DeleteAllNodes(head);
+            Node::DeleteAll(head);
         }
 
-        SaveReadingsSensor.ResetCounter(); 
-        SaveReadingsRepeater.ResetTime();
+        SaveSpeedSensor.ResetCounter(); 
+        SaveReadingsTimer.ResetTime();
     }
 
-    if (SendReadingsRepeater.IsPassed() && SendReadings) 
+    if (SendReadingsTimer.IsPassed() && SendReadings) 
     {
-        measured_speed = SendReadingsSensor.CalculateSpeed(SendReadingsRepeater.GetRepeatTime(), FrontWheel);
+        measured_speed = SendSpeedSensor.CalculateSpeed(SendReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
 
         msg_temp =  Message(measured_speed, measured_voltage);
 
         BluetoothAdapter::TransferMessage(msg_temp);
         
-        SendReadingsSensor.ResetCounter(); 
-        SendReadingsRepeater.ResetTime();
+        SendSpeedSensor.ResetCounter(); 
+        SendReadingsTimer.ResetTime();
     }
 
     if (Serial.available())

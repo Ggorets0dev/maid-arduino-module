@@ -15,7 +15,7 @@ Node* Node::CreateHead(float speed, float voltage)
 	return head;
 }
 
-void Node::InsertNode(Node* head, float speed, float voltage)
+void Node::Insert(Node* head, float speed, float voltage)
 {    
 	Node* current = head;
 	Node* node_to_insert = new Node(speed, voltage);
@@ -30,7 +30,7 @@ void Node::InsertNode(Node* head, float speed, float voltage)
 	node_to_insert = NULL;
 }
 
-void Node::DeleteAllNodes(Node* head)
+void Node::DeleteAll(Node* head)
 {
 	Node* current = head;
 	Node* to_delete;
