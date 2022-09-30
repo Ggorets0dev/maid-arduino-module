@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.4
+  Version: 0.7.4(E1)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.4"
+#define __MODULE_VERSION__ "0.7.4(E1)"
 
 
 #include <Arduino.h>
@@ -39,7 +39,11 @@ Voltmeter VoltageSensor(10, 100);
 Speedometer SendSpeedSensor(0);
 Speedometer SaveSpeedSensor(0);
 Signaler Signal(Signaler::Mode::Disabled, Signaler::Mode::Disabled);
+Logging Logger("logs.log", "blocks.xml");
 
+Sd2Card card;
+SdVolume volume;
+SdFile root;
 
 // * Creating interrupt handlers for all available interrupts
 void HandleSpeedometer(void) 
@@ -55,9 +59,15 @@ void HandleRightTurnOff(void) { Signal.DisableTurn(Signaler::Side::Right); }
 
 void setup() 
 {
-    Serial.begin(BAUD);
-
-    // randomSeed(analogRead(0)); // For testing readings transfering
+    Serial.begin(9600);
+    SD.begin(MEMORY_PIN);
+    
+    while (!Serial) {
+      ; // wait for serial port to connect. Needed for native USB port only
+    }
+    
+    if (!Logger.MemoryInit(card, volume, root))
+      Serial.println("Failed to load memory functions");
 
     pinMode(SPEEDOMETER_PIN, INPUT_PULLUP);
     pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);

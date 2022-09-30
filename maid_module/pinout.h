@@ -9,3 +9,4 @@
 #define RIGHT_TURN_LAMP_PIN 5  
 #define LEFT_TURN_BUTTON_PIN 6   
 #define LEFT_TURN_LAMP_PIN 7
+#define MEMORY_PIN 4

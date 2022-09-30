@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Arduino.h>
+#include <SPI.h>
+#include <SD.h>
 #include "models.h"
 #include "typedefs.h"
 
@@ -60,4 +62,26 @@ public:
     bool IsEnabled(Side side);
     void EnableTurn(Side side);
     void DisableTurn(Side side);
+};
+
+// * Provides work with memory (sd-card)
+class Logging
+{
+private:
+    String logs_filename;
+    String blocks_filename;
+    ulong volume_size_kb;
+public:
+	enum LogType
+	{
+		Error = 'E',
+		Warning = 'W',
+		Success = 'S',
+		Info = 'I'
+	};
+
+    Logging(String logs_filename, String blocks_filename);
+    bool MemoryInit(Sd2Card &card, SdVolume &volume, SdFile &root);
+    void WriteBlocks(Node* head);
+    void Log(LogType type, String msg); 
 };

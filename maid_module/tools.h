@@ -15,8 +15,8 @@ public:
     enum MessagePrefixes
     {
         EmptyPrefix = '?',
-        Request = '#',
-        Response = '$'
+        Request = '$',
+        Response = '#'
     };
     enum MessageCodes
     {
