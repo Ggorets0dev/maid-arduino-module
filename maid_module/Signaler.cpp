@@ -1,7 +1,7 @@
 #include "devices.h"
 
 // * Creating signaler with in itial values
-Signaler::Signaler(bool left_turn_mode, bool right_turn_mode)
+Signaler::Signaler(Mode left_turn_mode, Mode right_turn_mode)
 {
     this->IsLeftTurnEnabled = left_turn_mode;
     this->IsRightTurnEnabled = right_turn_mode;

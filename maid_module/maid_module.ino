@@ -28,7 +28,6 @@ Node* head;
 Timer SendReadingsTimer(2.0f);
 Timer SaveReadingsTimer(0.5f);
 const uint BAUD = 9600; 
-bool SendReadings = true;
 
 // * Settings of linked list with sensor readings
 uint Node::max_node_cnt = 10;    // ! Memory consumption is directly related to this amount
@@ -39,7 +38,7 @@ Wheel FrontWheel(8, 2070);
 Voltmeter VoltageSensor(10, 100);
 Speedometer SendSpeedSensor(0);
 Speedometer SaveSpeedSensor(0);
-Signaler Signal(false, false);
+Signaler Signal(Signaler::Mode::Disabled, Signaler::Mode::Disabled);
 
 
 // * Creating interrupt handlers for all available interrupts
@@ -75,7 +74,7 @@ void setup()
 
 void loop() 
 {
-    if (SaveReadingsTimer.IsPassed())
+    if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled())
     {
         measured_speed = SaveSpeedSensor.CalculateSpeed(SaveReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
@@ -96,7 +95,7 @@ void loop()
         SaveReadingsTimer.ResetTime();
     }
 
-    if (SendReadingsTimer.IsPassed() && SendReadings) 
+    if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled()) 
     {
         measured_speed = SendSpeedSensor.CalculateSpeed(SendReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
@@ -123,8 +122,8 @@ void loop()
             BluetoothAdapter::TransferMessage(msg_temp);
         }
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StartSensorReadings))
-            SendReadings = true;
+            SendReadingsTimer.Enable();
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StopSensorReadings))
-            SendReadings = false;
+            SendReadingsTimer.Disable();
     }
 }

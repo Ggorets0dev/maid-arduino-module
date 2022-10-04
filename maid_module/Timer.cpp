@@ -5,6 +5,7 @@ Timer::Timer(float repetition_time_sec)
 {
     this->time_from_repeat_ms = 0;
     this->repetition_time_sec = repetition_time_sec;
+    this->is_enabled = true;
 }
 
 // * Getting delay from class for calculations
@@ -16,7 +17,26 @@ float Timer::GetRepeatTime()
 // * Checking if delay is ended
 bool Timer::IsPassed()
 {
-    return ((float)millis() - (float)time_from_repeat_ms) / 1000.0 >= repetition_time_sec;
+    return ((float)millis() - (float)time_from_repeat_ms) / 1000.0f >= repetition_time_sec;
+}
+
+// * Check if time counting is enabled
+bool Timer::IsEnabled()
+{
+    return this->is_enabled;
+}
+
+// * Enable time counting
+void Timer::Enable()
+{
+    this->is_enabled = true;
+    ResetTime();
+}
+
+// * Disable time counting
+void Timer::Disable()
+{
+    this->is_enabled = false;
 }
 
 // * Reset time to start new delay

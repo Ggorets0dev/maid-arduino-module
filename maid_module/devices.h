@@ -20,7 +20,6 @@ private:
 public:
     Speedometer(uint impulse_cnt);
     float CalculateSpeed(float time_spent_sec, Wheel &wheel);
-    float CalculateAverageSpeed(Node* head);
     void CountImpulse();
     void ResetCounter();
 };
@@ -45,13 +44,19 @@ private:
 	uint LeftTurnMillis;
 	uint RightTurnMillis;
 public:
+    enum Mode
+    {
+        Enabled = true,
+        Disabled = false
+    };
+
     enum Side
     {
         Right = RIGHT_TURN_LAMP_PIN,
         Left = LEFT_TURN_BUTTON_PIN
     };
     
-    Signaler(bool left_turn_mode, bool right_turn_mode);
+    Signaler(Mode left_turn_mode, Mode right_turn_mode);
     bool IsEnabled(Side side);
     void EnableTurn(Side side);
     void DisableTurn(Side side);

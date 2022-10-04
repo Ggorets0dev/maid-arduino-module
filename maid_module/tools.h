@@ -42,9 +42,13 @@ class Timer
 private:
     ulong time_from_repeat_ms;
     float repetition_time_sec;
+    bool is_enabled;
 public:
     Timer(float repetition_time_sec);
     float GetRepeatTime();
     bool IsPassed();
+    bool IsEnabled();
+    void Enable();
+    void Disable();
     void ResetTime();
 };

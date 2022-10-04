@@ -22,16 +22,7 @@ void Speedometer::ResetCounter()
 float Speedometer::CalculateSpeed(float time_spent_sec, Wheel &wheel)
 {
     if (impulse_counter == 0) 
-        return 0.0;
+        return 0.0f;
     else 
-        return ((float)impulse_counter / (float)wheel.GetSpokesCount() * (float)wheel.GetWheelCircumference() / 1000000) * (60 * 60 / time_spent_sec);
-}
-
-// * Calculates the average speed over the elapsed time between nodes
-float CalculateAverageSpeed(Node* head)
-{
-    float speed_average = 0.0;
-    float speed_sum = 0.0;
-    float time_sum = 0.0;
-    return speed_average;
+        return ((float)impulse_counter / (float)wheel.GetSpokesCount() * (float)wheel.GetWheelCircumference() / 1000000.0f) * (60.0f * 60.0f / time_spent_sec);
 }
