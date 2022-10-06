@@ -21,8 +21,10 @@ void Speedometer::ResetCounter()
 // * Calculate speed with spoke count and time elapsed, parameters of wheel needed
 float Speedometer::CalculateSpeed(float time_spent_sec, Wheel &wheel)
 {
-    if (impulse_counter == 0) 
-        return 0.0f;
+    float speed = ((float)impulse_counter / (float)wheel.GetSpokesCount() * (float)wheel.GetWheelCircumference() / 1000000.0f) * (60.0f * 60.0f / time_spent_sec);
+    
+    if (impulse_counter != 0) 
+        return speed;
     else 
-        return ((float)impulse_counter / (float)wheel.GetSpokesCount() * (float)wheel.GetWheelCircumference() / 1000000.0f) * (60.0f * 60.0f / time_spent_sec);
+        return 0.0f;
 }

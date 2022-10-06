@@ -31,6 +31,7 @@ private:
     byte R1_kohm;
     byte R2_kohm;
 public:
+    static const uint minimal_reading_value = 0;
     Voltmeter(byte r1_kohm, byte r2_kohm);
     float CalculateVoltage(int analog_read_result);
 };
