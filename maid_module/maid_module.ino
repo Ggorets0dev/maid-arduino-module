@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.4(E1)
+  Version: 0.7.4(E3)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.4(E1)"
+#define __MODULE_VERSION__ "0.7.4(E3)"
 
 
 #include <Arduino.h>
@@ -59,7 +59,7 @@ void HandleRightTurnOff(void) { Signal.DisableTurn(Signaler::Side::Right); }
 
 void setup() 
 {
-    Serial.begin(9600);
+    Serial.begin(BAUD);
     SD.begin(MEMORY_PIN);
     
     while (!Serial) {
@@ -68,6 +68,8 @@ void setup()
     
     if (!Logger.MemoryInit(card, volume, root))
       Serial.println("Failed to load memory functions");
+
+    Serial.println(Logger.GetFreeSpaceSize());
 
     pinMode(SPEEDOMETER_PIN, INPUT_PULLUP);
     pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);

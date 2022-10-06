@@ -70,7 +70,7 @@ class Logging
 private:
     String logs_filename;
     String blocks_filename;
-    ulong volume_size_kb;
+    ulong volume_size_mb;
 public:
 	enum LogType
 	{
@@ -81,7 +81,8 @@ public:
 	};
 
     Logging(String logs_filename, String blocks_filename);
-    bool MemoryInit(Sd2Card &card, SdVolume &volume, SdFile &root);
+    ulong GetFreeSpaceSize();
+	bool MemoryInit(Sd2Card &card, SdVolume &volume, SdFile &root);
     void WriteBlocks(Node* head);
     void Log(LogType type, String msg); 
 };
