@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.4(E3)
+  Version: 0.7.4(E4)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.4(E3)"
+#define __MODULE_VERSION__ "0.7.4(E4)"
 
 
 #include <Arduino.h>
@@ -63,13 +63,16 @@ void setup()
     SD.begin(MEMORY_PIN);
     
     while (!Serial) {
-      ; // wait for serial port to connect. Needed for native USB port only
+      ; // * Wait for serial port to connect. Needed for native USB port only
     }
-    
-    if (!Logger.MemoryInit(card, volume, root))
-      Serial.println("Failed to load memory functions");
 
-    Serial.println(Logger.GetFreeSpaceSize());
+    if (!Memory::InitROM(card, volume, root))
+        Serial.println("Failed to load memory functions");
+
+    else if (Memory::GetFreeROM(volume) < Memory::minimal_free_rom_size)
+        Serial.println("No free space on card");
+    
+    Serial.println(Memory::GetFreeROM(volume));
 
     pinMode(SPEEDOMETER_PIN, INPUT_PULLUP);
     pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);
@@ -97,12 +100,13 @@ void loop()
         else
             Node::Insert(head, measured_speed, measured_voltage);
 
-        if (Node::node_cnt >= Node::max_node_cnt)
+        if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRAM() < Memory::minimal_free_ram_size)
         {
             Serial.println("Got all!");
             Node::DeleteAll(head);
         }
 
+        Serial.println(Memory::GetFreeRAM());
         SaveSpeedSensor.ResetCounter(); 
         SaveReadingsTimer.ResetTime();
     }
@@ -112,7 +116,7 @@ void loop()
         measured_speed = SendSpeedSensor.CalculateSpeed(SendReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
 
-        msg_temp =  Message(measured_speed, measured_voltage);
+        msg_temp = Message(measured_speed, measured_voltage);
 
         BluetoothAdapter::TransferMessage(msg_temp);
         

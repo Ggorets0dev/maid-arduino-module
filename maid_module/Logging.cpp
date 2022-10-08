@@ -2,77 +2,58 @@
 
 Logging::Logging(String logs_filename, String blocks_filename)
 {
+    this->now_date = EMPTY_STRING;
     this->logs_filename = logs_filename;
     this->blocks_filename = blocks_filename;
 }
 
-ulong Logging::GetFreeSpaceSize()
+void Logging::SetDate(String date)
 {
-    File root = SD.open("/");
-    ulong free_space_left_bytes = 0;
-
-    while (true)
-    {
-        File entry = root.openNextFile();
-        
-        if (!entry)
-        {
-            entry.close();
-            break;
-        }
-
-        else
-        {
-            free_space_left_bytes += entry.size();
-            entry.close();
-        }
-    }
-
-    root.close();
-    return volume_size_mb - (free_space_left_bytes / 1024 / 1024);
+    this->now_date = date;
 }
 
-bool Logging::MemoryInit(Sd2Card &card, SdVolume &volume, SdFile &root)
-{ 
-    if (!card.init(SPI_HALF_SPEED, MEMORY_PIN))
-    {
-        Serial.println("Not found!");
-        return false;
-    }
-
-	  else if (!volume.init(card))
-    {
-        Serial.println("Failed to init volume");
-        return false;
-    }
-
-    this->volume_size_mb = (volume.blocksPerCluster() * volume.clusterCount() * 512) / 1024 / 1024;
-    Serial.println(volume_size_mb);
-    root.openRoot(volume);
-
-    root.ls(LS_R);
-
-    File logs_file = SD.open(logs_filename);
-    File blocks_file = SD.open(blocks_filename);
-    
-  	if (!logs_file || !blocks_file)
-    {
-    		Serial.println("Failed to find all files needed");
-    		return false;
-  	}
-
-   logs_file.close();
-   blocks_file.close();
-  
-   return true;
+bool Logging::IsDateAvailable()
+{
+    return now_date != EMPTY_STRING;
 }
 
 void Logging::WriteBlocks(Node* head)
 {
+    Node* current = head;
+    File blocks_file = SD.open(blocks_filename, FILE_WRITE);
+    String reading;
 
+    while (current != NULL)
+    {
+        reading = "{R} " + String(current->time) + " | " + String(current->speed_kmh, 2) + " " + String(current->voltage_v, 2);
+        blocks_file.println(reading);
+    }
+
+    blocks_file.close();
+}
+
+bool Logging::WriteHeader(Wheel &wheel, Timer &save_readings_timer)
+{
+    if (now_date == EMPTY_STRING)
+        return false;
+
+    File blocks_file = SD.open(blocks_filename);
+
+    String header = "{H} " + now_date + " (" + String(wheel.GetSpokesCount()) + " / " + String(wheel.GetWheelCircumference()) + " / " + String(save_readings_timer.GetRepeatTime()) + " )";
+    blocks_file.println(header);
+
+    blocks_file.close();
+
+    return true;
 }
 
 void Logging::Log(LogType type, String msg)
 {
-	
+	File log_file = SD.open(logs_filename, FILE_WRITE);
+    String log = String(millis()) + " | " + String(type) + " | " + msg;
+
+    if (log_file)
+        log_file.println(log);
+    
+    log_file.close();
 }

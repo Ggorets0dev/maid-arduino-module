@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SD.h>
+#include <SPI.h>
 #include "models.h"
 #include "typedefs.h"
 
@@ -51,4 +53,15 @@ public:
     void Enable();
     void Disable();
     void ResetTime();
+};
+
+// * Responsible for monitoring the consumption of RAM and ROM
+class Memory
+{
+public:
+    static const byte minimal_free_ram_size = 75; // * bytes
+    static const byte minimal_free_rom_size = 10; // * megabytes
+    static bool InitROM(Sd2Card &card, SdVolume &volume, SdFile &root);
+    static uint GetFreeRAM();
+    static uint GetFreeROM(SdVolume &volume);
 };

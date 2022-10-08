@@ -64,13 +64,13 @@ public:
     void DisableTurn(Side side);
 };
 
-// * Provides work with memory (sd-card)
+// * Provides work with files (sd-card)
 class Logging
 {
 private:
+    String now_date;
     String logs_filename;
     String blocks_filename;
-    ulong volume_size_mb;
 public:
 	enum LogType
 	{
@@ -81,8 +81,9 @@ public:
 	};
 
     Logging(String logs_filename, String blocks_filename);
-    ulong GetFreeSpaceSize();
-	bool MemoryInit(Sd2Card &card, SdVolume &volume, SdFile &root);
+    void SetDate(String date);
+    bool IsDateAvailable();
     void WriteBlocks(Node* head);
+    bool WriteHeader(Wheel &wheel, Timer &save_readings_timer);
     void Log(LogType type, String msg); 
 };
