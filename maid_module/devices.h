@@ -39,7 +39,7 @@ public:
 };
 
 // * Provides work with left and right back signals
-class Signaler
+class Signaling
 {
 private:
     bool IsLeftTurnEnabled;
@@ -59,7 +59,7 @@ public:
         Left = LEFT_TURN_BUTTON_PIN
     };
     
-    Signaler(Mode left_turn_mode, Mode right_turn_mode);
+    Signaling(Mode left_turn_mode, Mode right_turn_mode);
     bool IsEnabled(Side side);
     void EnableTurn(Side side);
     void DisableTurn(Side side);

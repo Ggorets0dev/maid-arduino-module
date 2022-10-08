@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.4(E5)
+  Version: 0.7.4(E6)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.4(E5)"
+#define __MODULE_VERSION__ "0.7.4(E6)"
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -36,7 +36,7 @@ Wheel FrontWheel(8, 2070);
 Voltmeter VoltageSensor(10, 100);
 Speedometer SendSpeedSensor(0);
 Speedometer SaveSpeedSensor(0);
-Signaler Signal(Signaler::Mode::Disabled, Signaler::Mode::Disabled);
+Signaling Signaler(Signaling::Mode::Disabled, Signaling::Mode::Disabled);
 Logging Logger("logs.log", "blocks.txt");
 
 Sd2Card card;
@@ -49,10 +49,10 @@ void HandleSpeedometer(void)
     SendSpeedSensor.CountImpulse();
     SaveSpeedSensor.CountImpulse();
 }
-void HandleLeftTurnOn(void) { Signal.EnableTurn(Signaler::Side::Left); }
-void HandleLeftTurnOff(void) { Signal.DisableTurn(Signaler::Side::Left); }
-void HandleRightTurnOn(void) { Signal.EnableTurn(Signaler::Side::Right); }
-void HandleRightTurnOff(void) { Signal.DisableTurn(Signaler::Side::Right); }
+void HandleLeftTurnOn(void) { Signaler.EnableTurn(Signaling::Side::Left); }
+void HandleLeftTurnOff(void) { Signaler.DisableTurn(Signaling::Side::Left); }
+void HandleRightTurnOn(void) { Signaler.EnableTurn(Signaling::Side::Right); }
+void HandleRightTurnOff(void) { Signaler.DisableTurn(Signaling::Side::Right); }
 
 
 void setup() 

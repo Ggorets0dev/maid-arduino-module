@@ -1,7 +1,7 @@
 #include "devices.h"
 
-// * Creating signaler with in itial values
-Signaler::Signaler(Mode left_turn_mode, Mode right_turn_mode)
+// * Creating Signaling with in initial modes of turns
+Signaling::Signaling(Mode left_turn_mode, Mode right_turn_mode)
 {
     this->IsLeftTurnEnabled = left_turn_mode;
     this->IsRightTurnEnabled = right_turn_mode;
@@ -10,7 +10,7 @@ Signaler::Signaler(Mode left_turn_mode, Mode right_turn_mode)
 }
 
 // * Check if the turn signal is on
-bool Signaler::IsEnabled(Side side)
+bool Signaling::IsEnabled(Side side)
 {
     if (side == Side::Left)
         return IsLeftTurnEnabled;
@@ -23,7 +23,7 @@ bool Signaler::IsEnabled(Side side)
 }
 
 // * Enable left or right turn
-void Signaler::EnableTurn(Side side)
+void Signaling::EnableTurn(Side side)
 {
     digitalWrite(side, HIGH);
 
@@ -41,7 +41,7 @@ void Signaler::EnableTurn(Side side)
 }
 
 // * Disable left or right turn
-void Signaler::DisableTurn(Side side)
+void Signaling::DisableTurn(Side side)
 {
     digitalWrite(side, LOW);
 

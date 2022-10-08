@@ -1,5 +1,6 @@
 #include "devices.h"
 
+// * Creating Logging class with initial names of files
 Logging::Logging(String logs_filename, String blocks_filename)
 {
     this->now_date = EMPTY_STRING;
@@ -7,6 +8,7 @@ Logging::Logging(String logs_filename, String blocks_filename)
     this->blocks_filename = blocks_filename;
 }
 
+// * Try to set date of today, get it from app
 bool Logging::TrySetDate(String date)
 { 
     if (date.length() != 10)
@@ -25,11 +27,13 @@ bool Logging::TrySetDate(String date)
     return true;
 }
 
+// * Check if date was set before
 bool Logging::IsDateAvailable()
 {
     return now_date != EMPTY_STRING;
 }
 
+// * Write all readings to file
 void Logging::WriteBlocks(Node* head)
 {
     Node* current = head;
@@ -45,6 +49,7 @@ void Logging::WriteBlocks(Node* head)
     blocks_file.close();
 }
 
+// * Create header of readings in file
 void Logging::WriteHeader(Wheel &wheel, Timer &save_readings_timer)
 {
     File blocks_file = SD.open(blocks_filename);
@@ -55,6 +60,7 @@ void Logging::WriteHeader(Wheel &wheel, Timer &save_readings_timer)
     blocks_file.close();
 }
 
+// * Log event in file
 void Logging::Log(LogType type, String msg)
 {
 	File log_file = SD.open(logs_filename, FILE_WRITE);
