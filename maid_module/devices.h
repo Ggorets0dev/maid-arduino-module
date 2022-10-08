@@ -12,6 +12,7 @@ class BluetoothAdapter
 {
 public:
     static void TransferMessage(Message &msg);
+    static Message RecieveMessage();
 };
 
 // * Provides work with speed calculation
@@ -81,9 +82,9 @@ public:
 	};
 
     Logging(String logs_filename, String blocks_filename);
-    void SetDate(String date);
+    bool TrySetDate(String date);
     bool IsDateAvailable();
     void WriteBlocks(Node* head);
-    bool WriteHeader(Wheel &wheel, Timer &save_readings_timer);
+    void WriteHeader(Wheel &wheel, Timer &save_readings_timer);
     void Log(LogType type, String msg); 
 };

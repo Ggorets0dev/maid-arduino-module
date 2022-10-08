@@ -26,11 +26,11 @@ public:
         SendSensorReadings = 1,
         StartSensorReadings = 2,
         StopSensorReadings = 3,
-        GetModuleVersion = 4,
-        SendModuleVersion = 5,
-        EnableLeftTurn = 6,
-        EnableRightTurn = 7,
-        DisableTurns = 8
+        SendModuleVersion = 4,
+        EnableLeftTurn = 5,
+        EnableRightTurn = 6,
+        DisableTurns = 7,
+        GetNowDate = 8
     };
 
     static bool IsRequest(Message &msg);
@@ -62,6 +62,6 @@ public:
     static const byte minimal_free_ram_size = 75; // * bytes
     static const byte minimal_free_rom_size = 10; // * megabytes
     static bool InitROM(Sd2Card &card, SdVolume &volume, SdFile &root);
-    static uint GetFreeRAM();
-    static uint GetFreeROM(SdVolume &volume);
+    static uint GetFreeRAM(); // * bytes
+    static uint GetFreeROM(SdVolume &volume); // *megabytes
 };

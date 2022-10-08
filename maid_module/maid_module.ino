@@ -2,12 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.4(E4)
+  Version: 0.7.4(E5)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.4(E4)"
-
+#define __MODULE_VERSION__ "0.7.4(E5)"
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -20,7 +19,6 @@
 // * Variables-buffers for temporary storage
 float measured_speed;
 float measured_voltage;
-byte msg_byte_buffer[Message::maximal_message_length];
 Message msg_temp;
 Node* head;
 
@@ -39,7 +37,7 @@ Voltmeter VoltageSensor(10, 100);
 Speedometer SendSpeedSensor(0);
 Speedometer SaveSpeedSensor(0);
 Signaler Signal(Signaler::Mode::Disabled, Signaler::Mode::Disabled);
-Logging Logger("logs.log", "blocks.xml");
+Logging Logger("logs.log", "blocks.txt");
 
 Sd2Card card;
 SdVolume volume;
@@ -89,7 +87,7 @@ void setup()
 
 void loop() 
 {
-    if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled())
+    if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled() && Logger.IsDateAvailable())
     {
         measured_speed = SaveSpeedSensor.CalculateSpeed(SaveReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
@@ -103,6 +101,7 @@ void loop()
         if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRAM() < Memory::minimal_free_ram_size)
         {
             Serial.println("Got all!");
+            Logger.WriteBlocks(head);
             Node::DeleteAll(head);
         }
 
@@ -111,7 +110,7 @@ void loop()
         SaveReadingsTimer.ResetTime();
     }
 
-    if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled()) 
+    if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled() && Logger.IsDateAvailable()) 
     {
         measured_speed = SendSpeedSensor.CalculateSpeed(SendReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
@@ -126,19 +125,23 @@ void loop()
 
     if (Serial.available())
     {
-        Serial.readBytes(msg_byte_buffer, sizeof(msg_byte_buffer));
-        msg_temp = Message(String((char*)msg_byte_buffer));
-        memset(msg_byte_buffer, 0, sizeof(msg_byte_buffer));
+        msg_temp = BluetoothAdapter::RecieveMessage();
 
-        // Serial.println(msg_temp.ToString());
+        Serial.println("Got: " + msg_temp.ToString());
 
-        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetModuleVersion))
-        {
-            msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
-            BluetoothAdapter::TransferMessage(msg_temp);
+        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
+        {            
+            if (Logger.TrySetDate(msg_temp.GetData()))
+            {
+                Logger.WriteHeader(FrontWheel, SaveReadingsTimer);
+                msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
+                BluetoothAdapter::TransferMessage(msg_temp);
+            }
         }
+
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StartSensorReadings))
             SendReadingsTimer.Enable();
+        
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StopSensorReadings))
             SendReadingsTimer.Disable();
     }
