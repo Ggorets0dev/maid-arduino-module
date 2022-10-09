@@ -26,5 +26,5 @@ float Speedometer::CalculateSpeed(float time_spent_sec, Wheel &wheel)
     if (impulse_counter != 0) 
         return speed;
     else 
-        return 0.0f;
+        return ((float)impulse_counter / (float)wheel.GetSpokesCount() * (float)wheel.GetWheelCircumference() / 1000000.0f) * (60.0f * 60.0f / time_spent_sec);
 }

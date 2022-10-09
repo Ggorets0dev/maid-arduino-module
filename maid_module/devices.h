@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Arduino.h>
+#include <SPI.h>
+#include <SD.h>
 #include "models.h"
 #include "typedefs.h"
 
@@ -10,6 +12,7 @@ class BluetoothAdapter
 {
 public:
     static void TransferMessage(Message &msg);
+    static Message RecieveMessage();
 };
 
 // * Provides work with speed calculation
@@ -37,7 +40,7 @@ public:
 };
 
 // * Provides work with left and right back signals
-class Signaler
+class Signaling
 {
 private:
     bool IsLeftTurnEnabled;
@@ -57,8 +60,31 @@ public:
         Left = LEFT_TURN_BUTTON_PIN
     };
     
-    Signaler(Mode left_turn_mode, Mode right_turn_mode);
+    Signaling(Mode left_turn_mode, Mode right_turn_mode);
     bool IsEnabled(Side side);
     void EnableTurn(Side side);
     void DisableTurn(Side side);
+};
+
+// * Provides work with files (sd-card)
+class Logging
+{
+private:
+    String now_date;
+    String logs_filename;
+    String blocks_filename;
+public:
+	enum LogType
+	{
+		Error = 'E',
+		Warning = 'W',
+		Success = 'S',
+		Info = 'I'
+	};
+
+    Logging(String logs_filename, String blocks_filename);
+    bool TrySetDate(String date);
+    void WriteBlocks(Node* head);
+    void WriteHeader(Wheel &wheel, Timer &save_readings_timer);
+    void Log(LogType type, String msg); 
 };

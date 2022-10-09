@@ -1,5 +1,6 @@
 #include "models.h"
 
+// * Create Node example with readings inside
 Node::Node(float speed, float voltage)
 {
 	this->speed_kmh = speed;
@@ -8,6 +9,7 @@ Node::Node(float speed, float voltage)
 	this->next = NULL;
 }
 
+// * Create head of linked list
 Node* Node::CreateHead(float speed, float voltage)
 {
 	Node* head = new Node(speed, voltage);
@@ -15,6 +17,7 @@ Node* Node::CreateHead(float speed, float voltage)
 	return head;
 }
 
+// * Insert Node in linked list
 void Node::Insert(Node* head, float speed, float voltage)
 {    
 	Node* current = head;
@@ -30,6 +33,7 @@ void Node::Insert(Node* head, float speed, float voltage)
 	node_to_insert = NULL;
 }
 
+// * Delete all Nodes in linked list
 void Node::DeleteAll(Node* head)
 {
 	Node* current = head;
