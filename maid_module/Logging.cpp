@@ -27,12 +27,6 @@ bool Logging::TrySetDate(String date)
     return true;
 }
 
-// * Check if date was set before
-bool Logging::IsDateAvailable()
-{
-    return now_date != EMPTY_STRING;
-}
-
 // * Write all readings to file
 void Logging::WriteBlocks(Node* head)
 {
@@ -44,6 +38,7 @@ void Logging::WriteBlocks(Node* head)
     {
         reading = "{R} " + String(current->time) + " | " + String(current->speed_kmh, 2) + " " + String(current->voltage_v, 2);
         blocks_file.println(reading);
+        current = current->next;
     }
 
     blocks_file.close();
@@ -52,7 +47,7 @@ void Logging::WriteBlocks(Node* head)
 // * Create header of readings in file
 void Logging::WriteHeader(Wheel &wheel, Timer &save_readings_timer)
 {
-    File blocks_file = SD.open(blocks_filename);
+    File blocks_file = SD.open(blocks_filename, FILE_WRITE);
 
     String header = "{H} " + now_date + " (" + String(wheel.GetSpokesCount()) + " / " + String(wheel.GetWheelCircumference()) + " / " + String(save_readings_timer.GetRepeatTime()) + " )";
     blocks_file.println(header);

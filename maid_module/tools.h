@@ -30,7 +30,8 @@ public:
         EnableLeftTurn = 5,
         EnableRightTurn = 6,
         DisableTurns = 7,
-        GetNowDate = 8
+        GetNowDate = 8,
+		InitializationDone = 9
     };
 
     static bool IsRequest(Message &msg);

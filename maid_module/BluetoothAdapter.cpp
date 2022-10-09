@@ -14,7 +14,5 @@ Message BluetoothAdapter::RecieveMessage()
     Serial.readBytes(buffer, sizeof(buffer));
     Message msg_temp = Message(String((char*)buffer));
     
-    memset(buffer, 0, sizeof(buffer));
-    
     return msg_temp;
 }

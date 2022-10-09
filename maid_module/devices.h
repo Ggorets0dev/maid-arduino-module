@@ -83,7 +83,6 @@ public:
 
     Logging(String logs_filename, String blocks_filename);
     bool TrySetDate(String date);
-    bool IsDateAvailable();
     void WriteBlocks(Node* head);
     void WriteHeader(Wheel &wheel, Timer &save_readings_timer);
     void Log(LogType type, String msg); 

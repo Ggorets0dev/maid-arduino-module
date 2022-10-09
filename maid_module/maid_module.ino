@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.7.4(E6)
+  Version: 0.7.4(E7)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.7.4(E6)"
+#define __MODULE_VERSION__ "0.7.4(E7)"
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -15,6 +15,8 @@
 #include "models.h" 
 #include "devices.h"
 #include "tools.h"
+
+bool IsInitialized = false;
 
 // * Variables-buffers for temporary storage
 float measured_speed;
@@ -73,7 +75,7 @@ void setup()
     Serial.println(Memory::GetFreeROM(volume));
 
     pinMode(SPEEDOMETER_PIN, INPUT_PULLUP);
-    pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);
+    // pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);
     pinMode(LEFT_TURN_BUTTON_PIN, INPUT_PULLUP);
     pinMode(LEFT_TURN_LAMP_PIN, OUTPUT);
     pinMode(RIGHT_TURN_LAMP_PIN, OUTPUT);
@@ -87,7 +89,7 @@ void setup()
 
 void loop() 
 {
-    if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled() && Logger.IsDateAvailable())
+    if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled() && IsInitialized)
     {
         measured_speed = SaveSpeedSensor.CalculateSpeed(SaveReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
@@ -110,7 +112,7 @@ void loop()
         SaveReadingsTimer.ResetTime();
     }
 
-    if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled() && Logger.IsDateAvailable()) 
+    if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled() && IsInitialized) 
     {
         measured_speed = SendSpeedSensor.CalculateSpeed(SendReadingsTimer.GetRepeatTime(), FrontWheel);
         measured_voltage = VoltageSensor.CalculateVoltage(analogRead(VOLTMETER_PIN));
@@ -127,9 +129,12 @@ void loop()
     {
         msg_temp = BluetoothAdapter::RecieveMessage();
 
-        Serial.println("Got: " + msg_temp.ToString());
+        //Serial.println("Got: " + msg_temp.ToString());
 
-        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
+        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::InitializationDone))
+            IsInitialized = true;
+  
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
         {            
             if (Logger.TrySetDate(msg_temp.GetData()))
             {
