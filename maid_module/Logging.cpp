@@ -24,6 +24,9 @@ bool Logging::TrySetDate(String date)
     }
 
     this->now_date = date;
+
+    Log(Logging::LogType::Success, "Date was successfully retrieved and stored");
+
     return true;
 }
 
@@ -42,6 +45,8 @@ void Logging::WriteBlocks(Node* head)
     }
 
     blocks_file.close();
+
+    Log(Logging::LogType::Info, "Another list of nodes was written to the file");
 }
 
 // * Create header of readings in file
@@ -53,6 +58,8 @@ void Logging::WriteHeader(Wheel &wheel, Timer &save_readings_timer)
     blocks_file.println(header);
 
     blocks_file.close();
+
+    Log(Logging::LogType::Success, "Header was successfully created and written");
 }
 
 // * Log event in file
@@ -60,6 +67,9 @@ void Logging::Log(LogType type, String msg)
 {
 	File log_file = SD.open(logs_filename, FILE_WRITE);
     String log = String(millis()) + " | " + String(type) + " | " + msg;
+
+    if (now_date != EMPTY_STRING)
+        log = now_date + " " + log;
 
     if (log_file)
         log_file.println(log);

@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.9.0
+  Version: 0.10.0
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.9.0"
+#define __MODULE_VERSION__ "0.10.0"
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -60,7 +60,7 @@ void HandleRightTurnOff(void) { Signaler.DisableTurn(Signaling::Side::Right); }
 void setup() 
 {
     Serial.begin(BAUD);
-    SD.begin(MEMORY_PIN);
+    SD.begin(ROM_PIN);
     
     while (!Serial) {
       ; // * Wait for serial port to connect. Needed for native USB port only
@@ -70,12 +70,13 @@ void setup()
         Serial.println("Failed to load memory functions");
 
     else if (Memory::GetFreeROM(volume) < Memory::minimal_free_rom_size)
+    {
         Serial.println("No free space on card");
-    
-    Serial.println(Memory::GetFreeROM(volume));
+        Logger.Log(Logging::LogType::Error, "Module operation is not possible because there is not enough free permanent memory");
+    }
 
     pinMode(SPEEDOMETER_PIN, INPUT_PULLUP);
-    // pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(RIGHT_TURN_BUTTON_PIN, INPUT_PULLUP);
     pinMode(LEFT_TURN_BUTTON_PIN, INPUT_PULLUP);
     pinMode(LEFT_TURN_LAMP_PIN, OUTPUT);
     pinMode(RIGHT_TURN_LAMP_PIN, OUTPUT);
@@ -133,7 +134,13 @@ void loop()
 
         if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::InitializationDone))
             IsInitialized = true;
-  
+
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StartSensorReadings))
+            SendReadingsTimer.Enable();
+        
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StopSensorReadings))
+            SendReadingsTimer.Disable();
+
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
         {            
             if (Logger.TrySetDate(msg_temp.GetData()))
@@ -143,11 +150,5 @@ void loop()
                 BluetoothAdapter::TransferMessage(msg_temp);
             }
         }
-
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StartSensorReadings))
-            SendReadingsTimer.Enable();
-        
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StopSensorReadings))
-            SendReadingsTimer.Disable();
     }
 }
