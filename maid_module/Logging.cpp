@@ -1,11 +1,16 @@
 #include "devices.h"
 
-// * Creating Logging class with initial names of files
-Logging::Logging(String logs_filename, String blocks_filename)
+// * Creating Logging class with initial name of file
+Logging::Logging(String readings_filename)
 {
     this->now_date = EMPTY_STRING;
-    this->logs_filename = logs_filename;
-    this->blocks_filename = blocks_filename;
+    this->readings_filename = readings_filename;
+    this->last_write_time = 0;
+}
+
+ulong Logging::GetLastWriteTime()
+{
+    return this->last_write_time;
 }
 
 // * Try to set date of today, get it from app
@@ -25,54 +30,37 @@ bool Logging::TrySetDate(String date)
 
     this->now_date = date;
 
-    Log(Logging::LogType::Success, "Date was successfully retrieved and stored");
-
     return true;
 }
 
 // * Write all readings to file
-void Logging::WriteBlocks(Node* head)
+void Logging::WriteNodes(Node* head)
 {
     Node* current = head;
-    File blocks_file = SD.open(blocks_filename, FILE_WRITE);
+    File readings_file = SD.open(readings_filename, FILE_WRITE);
     String reading;
 
     while (current != NULL)
     {
-        reading = "{R} " + String(current->time) + " | " + String(current->speed_kmh, 2) + " " + String(current->voltage_v, 2);
-        blocks_file.println(reading);
+        reading = "{R} " + String(current->time) + " | " + String(current->impulse_cnt) + " | " + String(current->analog_voltage);
+        readings_file.println(reading);
         current = current->next;
     }
 
-    blocks_file.close();
+    readings_file.close();
 
-    Log(Logging::LogType::Info, "Another list of nodes was written to the file");
+    last_write_time = millis();
 }
 
 // * Create header of readings in file
-void Logging::WriteHeader(Wheel &wheel, Timer &save_readings_timer)
+void Logging::WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer)
 {
-    File blocks_file = SD.open(blocks_filename, FILE_WRITE);
+    File readings_file = SD.open(readings_filename, FILE_WRITE);
 
-    String header = "{H} " + now_date + " (" + String(wheel.GetSpokesCount()) + " / " + String(wheel.GetWheelCircumference()) + " / " + String(save_readings_timer.GetRepeatTime()) + " )";
-    blocks_file.println(header);
+    String header = "{H} " + now_date + " ( " + String(wheel.count_of_spokes) + " | " + String(wheel.wheel_circumference_mm) + " | " + String(voltmeter.GetMaxVoltage()) + " | "+ String(save_readings_timer.GetRepeatTime()) + " )";
+    readings_file.println(header);
 
-    blocks_file.close();
+    readings_file.close();
 
-    Log(Logging::LogType::Success, "Header was successfully created and written");
-}
-
-// * Log event in file
-void Logging::Log(LogType type, String msg)
-{
-	File log_file = SD.open(logs_filename, FILE_WRITE);
-    String log = String(millis()) + " | " + String(type) + " | " + msg;
-
-    if (now_date != EMPTY_STRING)
-        log = now_date + " " + log;
-
-    if (log_file)
-        log_file.println(log);
-    
-    log_file.close();
+    last_write_time = millis();
 }

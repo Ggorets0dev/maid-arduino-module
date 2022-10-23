@@ -1,27 +1,27 @@
 #include "models.h"
 
 // * Create Node example with readings inside
-Node::Node(float speed, float voltage)
+Node::Node(int impulse_cnt, int analog_voltage)
 {
-	this->speed_kmh = speed;
-	this->voltage_v = voltage;
+	this->impulse_cnt = impulse_cnt;
+	this->analog_voltage = analog_voltage;
     this->time = millis();
 	this->next = NULL;
 }
 
 // * Create head of linked list
-Node* Node::CreateHead(float speed, float voltage)
+Node* Node::CreateHead(int impulse_cnt, int analog_voltage)
 {
-	Node* head = new Node(speed, voltage);
+	Node* head = new Node(impulse_cnt, analog_voltage);
     node_cnt++;
 	return head;
 }
 
 // * Insert Node in linked list
-void Node::Insert(Node* head, float speed, float voltage)
+void Node::Insert(Node* head, int impulse_cnt, int analog_voltage)
 {    
 	Node* current = head;
-	Node* node_to_insert = new Node(speed, voltage);
+	Node* node_to_insert = new Node(impulse_cnt, analog_voltage);
 
 	while (current->next != NULL)
 		current = current->next;

@@ -15,15 +15,15 @@ class Node
 {
 public:
     static uint node_cnt;
-    static uint max_node_cnt;
-	float speed_kmh;
-	float voltage_v;
+    static constexpr uint max_node_cnt = 15; // ! Memory consumption is directly related to this amount
+	int impulse_cnt;
+	int analog_voltage;
     ulong time;
 	Node* next;
 
-	Node(float speed, float voltage);
-	static Node* CreateHead(float speed, float voltage);
-	static void Insert(Node* head, float speed, float voltage);
+	Node(int impulse_cnt, int analog_voltage);
+	static Node* CreateHead(int impulse_cnt, int analog_voltage);
+	static void Insert(Node* head, int impulse_cnt, int analog_voltage);
 	static void DeleteAll(Node* head);
 };
 
@@ -35,7 +35,8 @@ private:
     int code;
     String data;
 public:
-    static const uint maximal_message_length = 20;
+    static constexpr uint maximal_message_length = 20;
+    
     Message(String msg);
     Message(char prefix, int code, String data);
     Message(float speed, float voltage);
@@ -47,13 +48,18 @@ public:
 };
 
 // * Wheel used in motorcycle
-class Wheel
+struct Wheel
 {
-private:
     byte count_of_spokes;
     uint wheel_circumference_mm;
-public:
-    Wheel(byte spokes, uint size_mm);
-    byte GetSpokesCount();
-    uint GetWheelCircumference();
+
+    Wheel(byte spokes_cnt, uint wheel_circ_mm);
+};
+
+struct Reading
+{
+    int impulse_cnt = 0;
+    int analog_voltage = 0;
+    float speed_kmh = 0.0f;
+    float voltage_v = 0.0f;
 };

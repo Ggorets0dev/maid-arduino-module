@@ -8,6 +8,13 @@ Timer::Timer(float repetition_time_sec)
     this->is_enabled = true;
 }
 
+Timer::Timer()
+{
+    this->time_from_repeat_ms = 0;
+    this->repetition_time_sec = 2;
+    this->is_enabled = true;
+}
+
 // * Getting delay from class for calculations
 float Timer::GetRepeatTime()
 {

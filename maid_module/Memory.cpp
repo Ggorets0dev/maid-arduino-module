@@ -6,20 +6,10 @@ extern void *__brkval;
 bool Memory::InitROM(Sd2Card &card, SdVolume &volume, SdFile &root)
 { 
     if (!card.init(SPI_HALF_SPEED, ROM_PIN))
-    {
-        Serial.println("Not found!");
         return false;
-    }
 
-	  else if (!volume.init(card))
-    {
-        Serial.println("Failed to init volume");
+	else if (!volume.init(card))
         return false;
-    }
-
-    root.openRoot(volume);
-
-    root.ls(LS_R);
   
     return true;
 }
@@ -29,18 +19,18 @@ uint Memory::GetFreeRAM()
     int free_memory;
     
     if ((int)__brkval == 0)
-        free_memory = ((int)&free_memory) - ((int)&__bss_end);
+        return ((int)&free_memory) - ((int)&__bss_end);
     
     else
-        free_memory = ((int)&free_memory) - ((int)__brkval);
+        return ((int)&free_memory) - ((int)__brkval);
 
     return free_memory;
 }
 
 uint Memory::GetFreeROM(SdVolume &volume)
 {
-    File root = SD.open("/");
     ulong used_space = 0;
+    File root = SD.open("/");
 
     while (true)
     {

@@ -23,6 +23,7 @@ private:
 public:
     Speedometer(uint impulse_cnt);
     float CalculateSpeed(float time_spent_sec, Wheel &wheel);
+    int GetImpulseCount();
     void CountImpulse();
     void ResetCounter();
 };
@@ -31,39 +32,29 @@ public:
 class Voltmeter
 {
 private:
-    byte R1_kohm;
-    byte R2_kohm;
+    byte max_voltage;
 public:
-    static const uint minimal_reading_value = 0;
-    Voltmeter(byte r1_kohm, byte r2_kohm);
+    static constexpr float minimal_reading_value = 0.0f;
+    
+    Voltmeter(byte max_voltage);
+    byte GetMaxVoltage();
     float CalculateVoltage(int analog_read_result);
 };
 
-// * Provides work with left and right back signals
-class Signaling
+// * Provides work with leds and lamps
+class Signal
 {
 private:
-    bool IsLeftTurnEnabled;
-    bool IsRightTurnEnabled;
-	uint LeftTurnMillis;
-	uint RightTurnMillis;
+    uint led_pin;
+    bool is_shining;
+    float reaction_interval_sec;
 public:
-    enum Mode
-    {
-        Enabled = true,
-        Disabled = false
-    };
-
-    enum Side
-    {
-        Right = RIGHT_TURN_LAMP_PIN,
-        Left = LEFT_TURN_BUTTON_PIN
-    };
+    Timer ChangeStateTimer; 
     
-    Signaling(Mode left_turn_mode, Mode right_turn_mode);
-    bool IsEnabled(Side side);
-    void EnableTurn(Side side);
-    void DisableTurn(Side side);
+    Signal(uint led_pin, float delay_sec, bool enabled, float reaction_interval_sec=1.0f);
+    bool IsInReactionInterval(ulong time);
+    void TryBlink();
+    void BlinkForever(float multiplier=1.0f);
 };
 
 // * Provides work with files (sd-card)
@@ -71,20 +62,12 @@ class Logging
 {
 private:
     String now_date;
-    String logs_filename;
-    String blocks_filename;
+    String readings_filename;
+    ulong last_write_time;
 public:
-	enum LogType
-	{
-		Error = 'E',
-		Warning = 'W',
-		Success = 'S',
-		Info = 'I'
-	};
-
-    Logging(String logs_filename, String blocks_filename);
+    Logging(String readings_filename);
+    ulong GetLastWriteTime();
     bool TrySetDate(String date);
-    void WriteBlocks(Node* head);
-    void WriteHeader(Wheel &wheel, Timer &save_readings_timer);
-    void Log(LogType type, String msg); 
+    void WriteNodes(Node* head);
+    void WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer); 
 };

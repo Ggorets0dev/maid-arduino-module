@@ -48,6 +48,7 @@ private:
     bool is_enabled;
 public:
     Timer(float repetition_time_sec);
+    Timer();
     float GetRepeatTime();
     bool IsPassed();
     bool IsEnabled();
@@ -60,9 +61,10 @@ public:
 class Memory
 {
 public:
-    static const byte minimal_free_ram_size = 75; // * bytes
-    static const byte minimal_free_rom_size = 10; // * megabytes
+    static const byte minimal_free_ram_size = 75; // bytes
+    static const byte minimal_free_rom_size = 10; // megabytes
+    
     static bool InitROM(Sd2Card &card, SdVolume &volume, SdFile &root);
-    static uint GetFreeRAM(); // * bytes
-    static uint GetFreeROM(SdVolume &volume); // *megabytes
+    static uint GetFreeRAM(); // bytes
+    static uint GetFreeROM(SdVolume &volume); // megabytes
 };
