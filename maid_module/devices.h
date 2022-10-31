@@ -22,8 +22,8 @@ private:
     uint impulse_counter;
 public:
     Speedometer(uint impulse_cnt);
-    float CalculateSpeed(float time_spent_sec, Wheel &wheel);
-    int GetImpulseCount();
+    float CalculateSpeed(float time_spent_sec, Wheel &wheel) const;
+    int GetImpulseCount() const;
     void CountImpulse();
     void ResetCounter();
 };
@@ -37,8 +37,8 @@ public:
     static constexpr float minimal_reading_value = 0.0f;
     
     Voltmeter(byte max_voltage);
-    byte GetMaxVoltage();
-    float CalculateVoltage(int analog_read_result);
+    byte GetMaxVoltage() const;
+    float CalculateVoltage(int analog_read_result) const;
 };
 
 // * Provides work with leds and lamps
@@ -52,9 +52,9 @@ public:
     Timer ChangeStateTimer; 
     
     Signal(uint led_pin, float delay_sec, bool enabled, float reaction_interval_sec=1.0f);
-    bool IsInReactionInterval(ulong time);
+    bool IsInReactionInterval(ulong time) const;
     void TryBlink();
-    void BlinkForever(float multiplier=1.0f);
+    void BlinkForever(float multiplier=1.0f) const;
 };
 
 // * Provides work with files (sd-card)
@@ -66,7 +66,7 @@ private:
     ulong last_write_time;
 public:
     Logging(String readings_filename);
-    ulong GetLastWriteTime();
+    ulong GetLastWriteTime() const;
     bool TrySetDate(String date);
     void WriteNodes(Node* head);
     void WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer); 

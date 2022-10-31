@@ -30,21 +30,18 @@ public:
 // * Message which can be sent/recieved using bluetooth
 class Message
 {
-private:
+public:
+    static constexpr uint maximal_message_length = 20;
     char prefix;
     int code;
     String data;
-public:
-    static constexpr uint maximal_message_length = 20;
-    
+
     Message(String msg);
     Message(char prefix, int code, String data);
     Message(float speed, float voltage);
     Message();
-    char GetPrefix();
-    int GetCode();
-    String GetData();
-    String ToString();
+    String ToString() const;
+    static bool IsValid(Message msg);
 };
 
 // * Wheel used in motorcycle

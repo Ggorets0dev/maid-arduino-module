@@ -16,19 +16,19 @@ Timer::Timer()
 }
 
 // * Getting delay from class for calculations
-float Timer::GetRepeatTime()
+float Timer::GetRepeatTime() const
 {
     return this->repetition_time_sec;
 }
 
 // * Checking if delay is ended
-bool Timer::IsPassed()
+bool Timer::IsPassed() const
 {
     return ((float)millis() - (float)time_from_repeat_ms) / 1000.0f >= repetition_time_sec;
 }
 
 // * Check if time counting is enabled
-bool Timer::IsEnabled()
+bool Timer::IsEnabled() const
 {
     return this->is_enabled;
 }

@@ -8,7 +8,7 @@ Logging::Logging(String readings_filename)
     this->last_write_time = 0;
 }
 
-ulong Logging::GetLastWriteTime()
+ulong Logging::GetLastWriteTime() const
 {
     return this->last_write_time;
 }
@@ -49,7 +49,7 @@ void Logging::WriteNodes(Node* head)
 
     readings_file.close();
 
-    last_write_time = millis();
+    this->last_write_time = millis();
 }
 
 // * Create header of readings in file
@@ -62,5 +62,5 @@ void Logging::WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readin
 
     readings_file.close();
 
-    last_write_time = millis();
+    this->last_write_time = millis();
 }

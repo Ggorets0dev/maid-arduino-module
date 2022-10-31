@@ -7,13 +7,13 @@ Voltmeter::Voltmeter(byte max_voltage)
 }
 
 // * Get max input voltage on pin
-byte Voltmeter::GetMaxVoltage()
+byte Voltmeter::GetMaxVoltage() const
 {
     return this->max_voltage;
 }
 
 // * Calculate voltage using readings from analog Arduino port
-float Voltmeter::CalculateVoltage(int analog_read_result)
+float Voltmeter::CalculateVoltage(int analog_read_result) const
 {
     float vin = (float)analog_read_result * (float)max_voltage / 1023.0f;
 

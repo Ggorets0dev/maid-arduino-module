@@ -13,7 +13,7 @@ Signal::Signal(uint led_pin, float delay_sec, bool enabled, float reaction_inter
 }
 
 // * Checks if time is in device's reaction interval
-bool Signal::IsInReactionInterval(ulong time)
+bool Signal::IsInReactionInterval(ulong time) const
 {
     return (float)time > (abs((float)millis() - reaction_interval_sec) * 1000.0f);
 }
@@ -39,7 +39,7 @@ void Signal::TryBlink()
     }
 }
 
-void Signal::BlinkForever(float multiplier=1.0f)
+void Signal::BlinkForever(float multiplier=1.0f) const
 {
 	float delay_ms = ChangeStateTimer.GetRepeatTime() * multiplier * 1000.0f;
     while (true)

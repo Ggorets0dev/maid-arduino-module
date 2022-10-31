@@ -18,13 +18,13 @@ void Speedometer::ResetCounter()
     this->impulse_counter = 0; 
 }
 
-int Speedometer::GetImpulseCount()
+int Speedometer::GetImpulseCount() const
 {
     return this->impulse_counter;
 }
 
 // * Calculate speed with spoke count and time elapsed, parameters of wheel needed
-float Speedometer::CalculateSpeed(float time_spent_sec, Wheel &wheel)
+float Speedometer::CalculateSpeed(float time_spent_sec, Wheel &wheel) const
 {
     if (impulse_counter != 0) 
     {

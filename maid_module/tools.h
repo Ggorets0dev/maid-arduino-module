@@ -29,9 +29,10 @@ public:
         SendModuleVersion = 4,
         EnableLeftTurn = 5,
         EnableRightTurn = 6,
-        DisableTurns = 7,
-        GetNowDate = 8,
-		InitializationDone = 9
+        Alert = 7,
+        DisableTurns = 8,
+        GetNowDate = 9,
+		InitializationDone = 10
     };
 
     static bool IsRequest(Message &msg);
@@ -49,9 +50,9 @@ private:
 public:
     Timer(float repetition_time_sec);
     Timer();
-    float GetRepeatTime();
-    bool IsPassed();
-    bool IsEnabled();
+    float GetRepeatTime() const;
+    bool IsPassed() const;
+    bool IsEnabled() const;
     void Enable();
     void Disable();
     void ResetTime();

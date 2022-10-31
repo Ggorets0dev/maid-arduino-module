@@ -28,23 +28,22 @@ Message::Message()
     this->data = EMPTY_STRING;
 }
 
-
-int Message::GetCode()
-{ 
-    return this->code;
-}
-
-char Message::GetPrefix()
-{
-    return this->prefix;
-}
-
-String Message::GetData()
-{
-    return this->data;
-}
-
-String Message::ToString()
+String Message::ToString() const
 {
     return String(prefix) + "{" + String(code) + "}" + data + ";";
+}
+
+bool Message::IsValid(Message msg)
+{
+    bool prefix_check = msg.prefix == MessageAnalyzer::MessagePrefixes::EmptyPrefix ||
+                            msg.prefix == MessageAnalyzer::MessagePrefixes::Request ||
+                            msg.prefix == MessageAnalyzer::MessagePrefixes::Response;
+
+    bool code_check = msg.code >= MessageAnalyzer::MessageCodes::EmptyCode && 
+                        msg.code <= MessageAnalyzer::MessageCodes::InitializationDone;
+
+    bool data_check = msg.data.length() >= 0 && 
+                        msg.data.length() <= Message::maximal_message_length;
+
+    return prefix_check && code_check && data_check;
 }
