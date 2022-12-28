@@ -61,13 +61,14 @@ public:
 class Logging
 {
 private:
-    String now_date;
+    static constexpr uint date_time_length = 19; // dd.MM.yy_HH:mm:ss
+    String date_time;
     String readings_filename;
     ulong last_write_time;
 public:
     Logging(String readings_filename);
     ulong GetLastWriteTime() const;
-    bool TrySetDate(String date);
+    bool TrySetDateTime(String date_time);
     void WriteNodes(Node* head);
     void WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer); 
 };

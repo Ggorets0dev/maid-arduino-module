@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.12.0
+  Version: 0.12.1
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.12.0"
+#define __MODULE_VERSION__ "0.12.1"
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -46,11 +46,34 @@ SdVolume volume;
 SdFile root;
 
 // SECTION - Interruption handlers creation
-void HandleLeftTurnOn(void) { LeftTurning.ChangeStateTimer.Enable(); }
-void HandleLeftTurnOff(void) { LeftTurning.ChangeStateTimer.Disable(); }
-void HandleRightTurnOn(void) { RightTurning.ChangeStateTimer.Enable(); }
-void HandleRightTurnOff(void) { RightTurning.ChangeStateTimer.Disable(); }
-void HandleSpeedometer(void) { SpeedSensor.CountImpulse(); }
+void HandleLeftTurnOff(void)
+{             
+    if (LeftTurning.ChangeStateTimer.IsEnabled())
+        LeftTurning.ChangeStateTimer.Disable(); 
+}
+void HandleRightTurnOff(void)
+{
+    if (RightTurning.ChangeStateTimer.IsEnabled())
+        RightTurning.ChangeStateTimer.Disable();
+}
+void HandleLeftTurnOn(void) 
+{             
+    if (!LeftTurning.ChangeStateTimer.IsEnabled())
+        LeftTurning.ChangeStateTimer.Enable();
+    
+    HandleRightTurnOff();
+}
+void HandleRightTurnOn(void)
+{
+    if (!RightTurning.ChangeStateTimer.IsEnabled())
+        RightTurning.ChangeStateTimer.Enable();
+    
+    HandleLeftTurnOff();
+}
+void HandleSpeedometer(void) 
+{ 
+    SpeedSensor.CountImpulse(); 
+}
 // !SECTION
 
 void setup() 
@@ -66,10 +89,10 @@ void setup()
     // !SECTION
 
     // SECTION - Interruption handlers binding
-    attachPCINT(digitalPinToPCINT(LEFT_TURN_BUTTON_PIN), HandleLeftTurnOn, RISING);
-    attachPCINT(digitalPinToPCINT(LEFT_TURN_BUTTON_PIN), HandleLeftTurnOff, FALLING);
-    attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), HandleRightTurnOn, RISING);
-    attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), HandleRightTurnOff, FALLING);
+    attachPCINT(digitalPinToPCINT(LEFT_TURN_BUTTON_PIN), HandleLeftTurnOn, FALLING);
+    attachPCINT(digitalPinToPCINT(LEFT_TURN_BUTTON_PIN), HandleLeftTurnOff, RISING);
+    attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), HandleRightTurnOn, FALLING);
+    attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), HandleRightTurnOff, RISING);
     attachInterrupt(0, HandleSpeedometer, FALLING);
     // !SECTION
 
@@ -96,7 +119,6 @@ void loop()
     {
         last_reading.impulse_cnt = SpeedSensor.GetImpulseCount();
         last_reading.analog_voltage = analogRead(VOLTMETER_PIN);
-        Serial.println(last_reading.analog_voltage);
         last_reading.speed_kmh = SpeedSensor.CalculateSpeed(SaveReadingsTimer.GetRepeatTime(), FrontWheel);
         last_reading.voltage_v = VoltageSensor.CalculateVoltage(last_reading.analog_voltage);
 
@@ -131,14 +153,12 @@ void loop()
         {
             msg_temp = BluetoothAdapter::RecieveMessage();
             
-            // # NOTE - Check if app sended message with incorrect format
             if (!Message::IsValid(msg_temp))
                 return;
         }
+
         else
-        {
             msg_temp = Message();
-        }
 
         // SECTION - Processing incoming messages from the application
         if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::InitializationDone))
@@ -151,28 +171,15 @@ void loop()
             SendReadingsTimer.Disable();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::EnableLeftTurn))
-        {
-            LeftTurning.ChangeStateTimer.Enable();
-                
-            if (RightTurning.ChangeStateTimer.IsEnabled())
-                RightTurning.ChangeStateTimer.Disable();
-        }
+            HandleLeftTurnOn();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::EnableRightTurn))
-        {
-            RightTurning.ChangeStateTimer.Enable();
-                
-            if (LeftTurning.ChangeStateTimer.IsEnabled())
-                LeftTurning.ChangeStateTimer.Disable();
-        }
+            HandleRightTurnOff();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::DisableTurns))
-        { 
-            if (LeftTurning.ChangeStateTimer.IsEnabled())
-                LeftTurning.ChangeStateTimer.Disable();
-            
-            if (RightTurning.ChangeStateTimer.IsEnabled())
-                RightTurning.ChangeStateTimer.Disable();
+        {
+            HandleLeftTurnOff();
+            HandleRightTurnOff();
         }
 
         else if ((MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::Alert)) || IsAlert)
@@ -194,11 +201,15 @@ void loop()
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
         {    
-            if (Logger.TrySetDate(msg_temp.data))
+            if (Logger.TrySetDateTime(msg_temp.data))
             {
                 Logger.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
-                msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
-                BluetoothAdapter::TransferMessage(msg_temp);
+                
+                if (!IsInitialized)
+                {                    
+                    msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
+                    BluetoothAdapter::TransferMessage(msg_temp);
+                }
             }
         }
         // !SECTION
@@ -210,7 +221,7 @@ void loop()
     else if (!SdCardSaving.IsInReactionInterval(Logger.GetLastWriteTime()) && SdCardSaving.ChangeStateTimer.IsEnabled())
         SdCardSaving.ChangeStateTimer.Disable();
 
-     LeftTurning.TryBlink();
-     RightTurning.TryBlink();
-     SdCardSaving.TryBlink();
+    LeftTurning.TryBlink();
+    RightTurning.TryBlink();
+    SdCardSaving.TryBlink();
 }
