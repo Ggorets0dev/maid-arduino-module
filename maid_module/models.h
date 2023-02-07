@@ -16,22 +16,22 @@ class Node
 public:
     static uint node_cnt;
     static constexpr uint max_node_cnt = 15; // ! Memory consumption is directly related to this amount
-	int impulse_cnt;
-	int analog_voltage;
+    int impulse_cnt;
+    int analog_voltage;
     ulong time;
-	Node* next;
+    Node* next;
 
-	Node(int impulse_cnt, int analog_voltage, ulong millis);
-	static Node* CreateHead(int impulse_cnt, int analog_voltage, ulong millis);
-	static void Insert(Node* head, int impulse_cnt, int analog_voltage, ulong millis);
-	static void DeleteAll(Node* head);
+    Node(int impulse_cnt, int analog_voltage, ulong millis);
+    static Node* CreateHead(int impulse_cnt, int analog_voltage, ulong millis);
+    static void Insert(Node* head, int impulse_cnt, int analog_voltage, ulong millis);
+    static void DeleteAll(Node* head);
 };
 
 // * Message which can be sent/recieved using bluetooth
 class Message
 {
 public:
-    static constexpr uint maximal_message_length = 20;
+    static constexpr uint maximal_message_length = 25;
     char prefix;
     int code;
     String data;

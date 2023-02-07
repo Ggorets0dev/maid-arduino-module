@@ -40,10 +40,10 @@ bool Message::IsValid(Message msg)
                             msg.prefix == MessageAnalyzer::MessagePrefixes::Response;
 
     bool code_check = msg.code >= MessageAnalyzer::MessageCodes::EmptyCode && 
-                        msg.code <= MessageAnalyzer::MessageCodes::InitializationDone;
+                            msg.code <= MessageAnalyzer::MessageCodes::InitializationDone;
 
     bool data_check = msg.data.length() >= 0 && 
-                        msg.data.length() <= Message::maximal_message_length;
+                            msg.data.length() <= Message::maximal_message_length;
 
     return prefix_check && code_check && data_check;
 }

@@ -12,6 +12,9 @@ Message BluetoothAdapter::RecieveMessage()
     byte buffer[Message::maximal_message_length];
 
     Serial.readBytes(buffer, sizeof(buffer));
+
+    Serial.println(String((char*)buffer));
+
     Message msg_temp = Message(String((char*)buffer));
     
     return msg_temp;
