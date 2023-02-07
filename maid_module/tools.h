@@ -69,3 +69,11 @@ public:
     static uint GetFreeRAM(); // bytes
     static uint GetFreeROM(SdVolume &volume); // megabytes
 };
+
+// * Getting the number of milliseconds that have elapsed since the header was recorded
+class MillisTracker
+{
+public:
+    ulong initialization_time_ms = 0;
+    ulong operator ()();
+};

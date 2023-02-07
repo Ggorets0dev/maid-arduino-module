@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.12.1
+  Version: 0.13.0
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.12.1"
+#define __MODULE_VERSION__ "0.13.0"
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -26,6 +26,7 @@ bool IsInitialized = false;
 bool IsAlert = false;
 Timer SendReadingsTimer(2.0f);
 Timer SaveReadingsTimer(0.5f);
+MillisTracker millis_passed;
 
 // * Settings of linked list with sensor readings
 uint Node::node_cnt = 0; // NOTE - Starting the node count from zero
@@ -39,7 +40,7 @@ Signal SdCardSaving(ROM_SAVE_SIGNAL_PIN, 0.20f, false, 2.0f);
 Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
 Signal LeftTurning(LEFT_TURN_LAMP_PIN, 1.0f, false);
 Signal RightTurning(RIGHT_TURN_LAMP_PIN, 1.0f, false);
-Logging Logger("readings.txt");
+Logging Logger("data.txt");
 
 Sd2Card card;
 SdVolume volume;
@@ -115,6 +116,7 @@ void setup()
 
 void loop() 
 {
+    Serial.println(digitalRead(LEFT_TURN_BUTTON_PIN));
     if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled() && IsInitialized)
     {
         last_reading.impulse_cnt = SpeedSensor.GetImpulseCount();
@@ -123,10 +125,10 @@ void loop()
         last_reading.voltage_v = VoltageSensor.CalculateVoltage(last_reading.analog_voltage);
 
         if (Node::node_cnt == 0)
-            head = Node::CreateHead(last_reading.impulse_cnt, last_reading.analog_voltage);
+            head = Node::CreateHead(last_reading.impulse_cnt, last_reading.analog_voltage, millis_passed());
         
         else
-            Node::Insert(head, last_reading.impulse_cnt, last_reading.analog_voltage);
+            Node::Insert(head, last_reading.impulse_cnt, last_reading.analog_voltage, millis_passed());
 
         if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRAM() < Memory::minimal_free_ram_size)
         {
@@ -174,7 +176,7 @@ void loop()
             HandleLeftTurnOn();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::EnableRightTurn))
-            HandleRightTurnOff();
+            HandleRightTurnOn();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::DisableTurns))
         {
@@ -200,15 +202,19 @@ void loop()
         }
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
-        {    
+        {   
             if (Logger.TrySetDateTime(msg_temp.data))
             {
                 Logger.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
-                
+                millis_passed.initialization_time_ms = millis();
                 if (!IsInitialized)
                 {                    
                     msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
                     BluetoothAdapter::TransferMessage(msg_temp);
+                }
+                else if (Node::node_cnt != 0)
+                {
+                    Node::DeleteAll(head);
                 }
             }
         }

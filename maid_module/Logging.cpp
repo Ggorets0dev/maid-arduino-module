@@ -16,33 +16,33 @@ ulong Logging::GetLastWriteTime() const
 // * Try to set date of today, get it from app
 bool Logging::TrySetDateTime(String date_time)
 {
-    if (date_time.length() != Logging::date_time_length)
-        return false;
+   if (date_time.length() != Logging::date_time_length)
+       return false;
 
-    int time_inx;
-    for (int i(0); i < date_time.length(); i++)
-    { 
-        if (date_time[i] == '-')
-        {
-            time_inx = i+1;
-            break;
-        }
-            
-        else if ((i == 2 || i == 5) && (date_time[i] != '.'))
-            return false;
+   int time_inx;
+   for (int i(0); i < date_time.length(); i++)
+   { 
+       if (date_time[i] == '-')
+       {
+           time_inx = i+1;
+           break;
+       }
+           
+       else if ((i == 2 || i == 5) && (date_time[i] != '.'))
+           return false;
 
-        else if ((i != 2 && i != 5) && !isdigit(date_time[i]))
-            return false;
-    }
-    
-    for (int i(time_inx); i < date_time.length(); i++)
-    {
-        if ((i == time_inx + 2 || i == time_inx + 5) && (date_time[i] != ':'))
-            return false;
-        
-        else if ((i != time_inx + 2 && i != time_inx + 5) && !isdigit(date_time[i]))
-            return false;
-    }
+       else if ((i != 2 && i != 5) && !isdigit(date_time[i]))
+           return false;
+   }
+   
+   for (int i(time_inx); i < date_time.length(); i++)
+   {
+       if ((i == time_inx + 2 || i == time_inx + 5) && (date_time[i] != ':'))
+           return false;
+       
+       else if ((i != time_inx + 2 && i != time_inx + 5) && !isdigit(date_time[i]))
+           return false;
+   }
     
     this->date_time = date_time;
     return true;

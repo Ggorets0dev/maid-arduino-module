@@ -61,7 +61,7 @@ public:
 class Logging
 {
 private:
-    static constexpr uint date_time_length = 19; // dd.MM.yy_HH:mm:ss
+    static constexpr uint date_time_length = 19; // dd.MM.yyyy-HH:mm:ss
     String date_time;
     String readings_filename;
     ulong last_write_time;

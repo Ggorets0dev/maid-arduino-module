@@ -21,9 +21,9 @@ public:
     ulong time;
 	Node* next;
 
-	Node(int impulse_cnt, int analog_voltage);
-	static Node* CreateHead(int impulse_cnt, int analog_voltage);
-	static void Insert(Node* head, int impulse_cnt, int analog_voltage);
+	Node(int impulse_cnt, int analog_voltage, ulong millis);
+	static Node* CreateHead(int impulse_cnt, int analog_voltage, ulong millis);
+	static void Insert(Node* head, int impulse_cnt, int analog_voltage, ulong millis);
 	static void DeleteAll(Node* head);
 };
 
