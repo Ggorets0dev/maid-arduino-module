@@ -15,7 +15,10 @@ Signal::Signal(uint led_pin, float delay_sec, bool enabled, float reaction_inter
 // * Checks if time is in device's reaction interval
 bool Signal::IsInReactionInterval(ulong time) const
 {
-    return (float)time > (abs((float)millis() - reaction_interval_sec) * 1000.0f);
+    float reaction_interval_ms = reaction_interval_sec * 1000.0f;
+    float time_difference_ms = abs((float)millis() - reaction_interval_ms);
+    
+    return (float)time > time_difference_ms;
 }
 
 // * Blinks using timer inside the class

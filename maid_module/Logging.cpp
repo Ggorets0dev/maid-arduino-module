@@ -51,10 +51,10 @@ bool Logging::TrySetDateTime(String date_time)
 // * Write all readings to file
 void Logging::WriteNodes(Node* head)
 {
-    Node* current = head;
     File readings_file = SD.open(readings_filename, FILE_WRITE);
+    
+    Node* current = head;
     String reading;
-
     while (current != NULL)
     {
         reading = "{R} " + String(current->time) + " | " + String(current->impulse_cnt) + " | " + String(current->analog_voltage);
@@ -70,11 +70,10 @@ void Logging::WriteNodes(Node* head)
 // * Create header of readings in file
 void Logging::WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer)
 {
-    File readings_file = SD.open(readings_filename, FILE_WRITE);
-
     String header = "{H} " + date_time + " ( " + String(wheel.count_of_spokes) + " | " + String(wheel.wheel_circumference_mm) + " | " + String(voltmeter.GetMaxVoltage()) + " | "+ String(save_readings_timer.GetRepeatTime()) + " )";
-    readings_file.println(header);
 
+    File readings_file = SD.open(readings_filename, FILE_WRITE);
+    readings_file.println(header);
     readings_file.close();
 
     this->last_write_time = millis();

@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.13.1
+  Version: 0.13.2
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.13.1"
+#define __MODULE_VERSION__ "0.13.2"
 
 #include <Arduino.h>
 #include "PinChangeInterrupt.h"
@@ -112,6 +112,11 @@ void setup()
     attachInterrupt(SPEEDOMETER_PIN - 2, HandleSpeedometer, FALLING);
     // !SECTION
 
+    if (!(bool)digitalRead(LEFT_TURN_BUTTON_PIN))
+        LeftTurning.ChangeStateTimer.Enable();
+    if (!(bool)digitalRead(RIGHT_TURN_BUTTON_PIN))
+        RightTurning.ChangeStateTimer.Enable();
+
     Serial.begin(BAUD);
     SD.begin(ROM_PIN);
 
@@ -145,6 +150,7 @@ void loop()
 
         if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRAM() < Memory::minimal_free_ram_size)
         {
+            Serial.println("HI!");
             Logger.WriteNodes(head);
             Node::DeleteAll(head);
         }

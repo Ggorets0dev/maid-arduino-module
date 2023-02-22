@@ -32,7 +32,7 @@ public:
         Alert = 7,
         DisableTurns = 8,
         GetNowDate = 9,
-		InitializationDone = 10
+		    InitializationDone = 10
     };
 
     static bool IsRequest(Message &msg);

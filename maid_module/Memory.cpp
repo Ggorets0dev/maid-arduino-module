@@ -23,15 +23,13 @@ uint Memory::GetFreeRAM()
     
     else
         return ((int)&free_memory) - ((int)__brkval);
-
-    return free_memory;
 }
 
 uint Memory::GetFreeROM(SdVolume &volume)
 {
-    ulong used_space = 0;
     File root = SD.open("/");
 
+    ulong used_space = 0;
     while (true)
     {
         File entry = root.openNextFile();
