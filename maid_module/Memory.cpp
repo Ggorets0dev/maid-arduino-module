@@ -5,7 +5,7 @@ extern void *__brkval;
 
 bool Memory::InitROM(Sd2Card &card, SdVolume &volume, SdFile &root)
 { 
-    if (!card.init(SPI_HALF_SPEED, ROM_PIN))
+    if (!card.init(SPI_HALF_SPEED, ROM_DATA_PIN))
         return false;
 
 	else if (!volume.init(card))

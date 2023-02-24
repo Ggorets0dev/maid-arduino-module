@@ -1,17 +1,17 @@
 #include "devices.h"
 
 // * Transfer message using bluetooth connection
-void BluetoothAdapter::TransferMessage(Message &msg)
+void BluetoothAdapter::TransferMessage(Message &msg, AltSoftSerial &BtSerial)
 {
-    Serial.println(msg.ToString());
+    BtSerial.println(msg.ToString());
 }
 
 // * Recieve message using bluetooth connection
-Message BluetoothAdapter::RecieveMessage()
+Message BluetoothAdapter::RecieveMessage(AltSoftSerial &BtSerial)
 {
     byte buffer[Message::maximal_message_length];
-    Serial.readBytes(buffer, sizeof(buffer));
+    BtSerial.readBytes(buffer, sizeof(buffer));
     Message msg_temp = Message(String((char*)buffer));
     
-	return msg_temp;
+	  return msg_temp;
 }

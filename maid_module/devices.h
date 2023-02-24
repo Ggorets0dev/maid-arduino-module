@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <AltSoftSerial.h>
 #include <SPI.h>
 #include <SD.h>
 #include "models.h"
@@ -11,8 +12,8 @@
 class BluetoothAdapter
 {
 public:
-    static void TransferMessage(Message &msg);
-    static Message RecieveMessage();
+    static void TransferMessage(Message &msg, AltSoftSerial &BtSerial);
+    static Message RecieveMessage(AltSoftSerial &BtSerial);
 };
 
 // * Provides work with speed calculation

@@ -2,13 +2,14 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.13.2
+  Version: 0.13.2(E1)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.13.2"
+#define __MODULE_VERSION__ "0.13.2(E1)"
 
 #include <Arduino.h>
+#include <AltSoftSerial.h>
 #include "PinChangeInterrupt.h"
 #include "pinout.h"
 #include "typedefs.h"
@@ -33,10 +34,11 @@ uint Node::node_cnt = 0; // NOTE - Starting the node count from zero
 Node* head = NULL;
 
 // NOTE - Initialization of all classes-devices required for work
+AltSoftSerial BtSerial;
 Wheel FrontWheel(8, 2070);
 Voltmeter VoltageSensor(60);
 Speedometer SpeedSensor(0);
-Signal SdCardSaving(ROM_SAVE_SIGNAL_PIN, 0.20f, false, 2.0f);
+Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
 Signal LeftTurning(LEFT_TURN_LAMP_PIN, 1.0f, false);
 Signal RightTurning(RIGHT_TURN_LAMP_PIN, 1.0f, false);
@@ -103,7 +105,7 @@ void setup()
     pinMode(LEFT_TURN_LAMP_PIN, OUTPUT);
     pinMode(RIGHT_TURN_LAMP_PIN, OUTPUT);
     pinMode(ERROR_SIGNAL_PIN, OUTPUT);
-    pinMode(ROM_SAVE_SIGNAL_PIN, OUTPUT);
+    pinMode(ROM_SIGNAL_PIN, OUTPUT);
     // !SECTION
 
     // SECTION - Interruption handlers binding
@@ -118,12 +120,8 @@ void setup()
         RightTurning.ChangeStateTimer.Enable();
 
     Serial.begin(BAUD);
-    SD.begin(ROM_PIN);
-
-    while (!Serial) 
-    {
-      ; // NOTE - Wait for serial port to connect. Needed for native USB port only
-    }
+    BtSerial.begin(BAUD);
+    SD.begin(ROM_DATA_PIN);
 
     if (!Memory::InitROM(card, volume, root))
         ErrorOccuring.BlinkForever();
@@ -150,7 +148,6 @@ void loop()
 
         if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRAM() < Memory::minimal_free_ram_size)
         {
-            Serial.println("HI!");
             Logger.WriteNodes(head);
             Node::DeleteAll(head);
         }
@@ -165,18 +162,18 @@ void loop()
     { 
         msg_temp = Message(last_reading.speed_kmh, last_reading.voltage_v);
 
-        BluetoothAdapter::TransferMessage(msg_temp);
+        BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
          
         SendReadingsTimer.ResetTime();
     }
     // !SECTION
 
     // SECTION - Processing of signals from the control device
-    if (Serial.available() || IsAlert)
+    if (BtSerial.available() || IsAlert)
     {
-        if (Serial.available())
+        if (BtSerial.available())
         {
-            msg_temp = BluetoothAdapter::RecieveMessage();
+            msg_temp = BluetoothAdapter::RecieveMessage(BtSerial);
             
             if (!Message::IsValid(msg_temp))
                 return;
@@ -232,7 +229,7 @@ void loop()
                 if (!IsInitialized)
                 {                    
                     msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
-                    BluetoothAdapter::TransferMessage(msg_temp);
+                    BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
                 }
                 else if (Node::node_cnt != 0)
                 {
