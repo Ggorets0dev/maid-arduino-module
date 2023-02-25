@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.13.2(E1)
+  Version: 0.13.2(E2)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.13.2(E1)"
+#define __MODULE_VERSION__ "0.13.2(E2)"
 
 #include <Arduino.h>
 #include <AltSoftSerial.h>
@@ -21,78 +21,82 @@
 Reading last_reading;
 Message msg_temp;
 
-// NOTE - Technical vars required for the application
+// NOTE - Setting up transfer ports
 const uint BAUD = 9600; 
-bool IsInitialized = false;
-bool IsAlert = false;
-Timer SendReadingsTimer(2.0f);
-Timer SaveReadingsTimer(0.5f);
-MillisTracker millis_passed;
-
-// NOTE - Settings of linked list with sensor readings
-uint Node::node_cnt = 0; // NOTE - Starting the node count from zero
-Node* head = NULL;
-
-// NOTE - Initialization of all classes-devices required for work
+HardwareSerial &UsbSerial = Serial;
 AltSoftSerial BtSerial;
-Wheel FrontWheel(8, 2070);
-Voltmeter VoltageSensor(60);
-Speedometer SpeedSensor(0);
-Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
-Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
+
+// NOTE - Variables for LED indicator feeds
+bool IsAlert = false;
 Signal LeftTurning(LEFT_TURN_LAMP_PIN, 1.0f, false);
 Signal RightTurning(RIGHT_TURN_LAMP_PIN, 1.0f, false);
-Logging Logger("data.txt");
+Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
+Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 
+// NOTE - Setting up to transmit and save readings
+bool IsInitialized = false;
+Timer SendReadingsTimer(2.0f);
+Timer SaveReadingsTimer(0.5f);
+Logging Logger("data.txt");
+MillisTracker millis_passed;
 Sd2Card card;
 SdVolume volume;
 SdFile root;
 
+// NOTE - Setting up a single-link list for storing information
+uint Node::node_cnt = 0;
+Node* head = NULL;
+
+// NOTE - Setting up devices to receive and calculate data
+Wheel FrontWheel(8, 2070);
+Voltmeter VoltageSensor(60);
+Speedometer SpeedSensor(0);
+
 // SECTION - Interruption handlers
-void HandleLeftTurnChangeState(void)
+void ChangeStateLeftTurn(void)
 {             
     if (LeftTurning.ChangeStateTimer.IsEnabled())
         LeftTurning.ChangeStateTimer.Disable(); 
     else
         LeftTurning.ChangeStateTimer.Enable();
 }
-void HandleRightTurnChangeState(void)
+void ChangeStateRightTurn(void)
 {             
     if (RightTurning.ChangeStateTimer.IsEnabled())
         RightTurning.ChangeStateTimer.Disable(); 
     else
         RightTurning.ChangeStateTimer.Enable();
 }
-void HandleSpeedometer(void) 
+void CountImpulse(void) 
 { 
     SpeedSensor.CountImpulse(); 
 }
 // !SECTION
 
 // SECTION - Working with turn signals via codes from control devices
-void HandleLeftTurnOff(void)
+void DisableLeftTurn(void)
 {             
     if (LeftTurning.ChangeStateTimer.IsEnabled())
         LeftTurning.ChangeStateTimer.Disable(); 
 }
-void HandleRightTurnOff(void)
+void DisableRightTurn(void)
 {
     if (RightTurning.ChangeStateTimer.IsEnabled())
         RightTurning.ChangeStateTimer.Disable();
 }
-void HandleLeftTurnOn(void) 
+void EnableLeftTurn(void) 
 {             
     if (!LeftTurning.ChangeStateTimer.IsEnabled())
         LeftTurning.ChangeStateTimer.Enable();
     
-    HandleRightTurnOff();
+    DisableRightTurn();
 }
-void HandleRightTurnOn(void)
+void EnableRightTurn(void)
 {
     if (!RightTurning.ChangeStateTimer.IsEnabled())
         RightTurning.ChangeStateTimer.Enable();
     
-    HandleLeftTurnOff();
+    DisableLeftTurn();
 }
 // !SECTION
 
@@ -109,25 +113,24 @@ void setup()
     // !SECTION
 
     // SECTION - Interruption handlers binding
-    attachPCINT(digitalPinToPCINT(LEFT_TURN_BUTTON_PIN), HandleLeftTurnChangeState, CHANGE);
-    attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), HandleRightTurnChangeState, CHANGE);
-    attachInterrupt(SPEEDOMETER_PIN - 2, HandleSpeedometer, FALLING);
+    attachPCINT(digitalPinToPCINT(LEFT_TURN_BUTTON_PIN), ChangeStateLeftTurn, CHANGE);
+    attachPCINT(digitalPinToPCINT(RIGHT_TURN_BUTTON_PIN), ChangeStateRightTurn, CHANGE);
+    attachInterrupt(SPEEDOMETER_PIN - 2, CountImpulse, FALLING);
     // !SECTION
 
+    // SECTION - Installing the original state of the turn signals
     if (!(bool)digitalRead(LEFT_TURN_BUTTON_PIN))
         LeftTurning.ChangeStateTimer.Enable();
     if (!(bool)digitalRead(RIGHT_TURN_BUTTON_PIN))
         RightTurning.ChangeStateTimer.Enable();
+    // !SECTION
 
-    Serial.begin(BAUD);
+    UsbSerial.begin(BAUD);
     BtSerial.begin(BAUD);
     SD.begin(ROM_DATA_PIN);
 
-    if (!Memory::InitROM(card, volume, root))
+    if (!Memory::InitROM(card, volume, root) || Memory::GetFreeROM(volume) < Memory::minimal_free_rom_size)
         ErrorOccuring.BlinkForever();
-
-    else if (Memory::GetFreeROM(volume) < Memory::minimal_free_rom_size)
-        ErrorOccuring.BlinkForever(); 
 }
 
 void loop() 
@@ -182,6 +185,7 @@ void loop()
         else
             msg_temp = Message();
 
+
         if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::InitializationDone))
             IsInitialized = true;
 
@@ -192,15 +196,15 @@ void loop()
             SendReadingsTimer.Disable();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::EnableLeftTurn))
-            HandleLeftTurnOn();
+            EnableLeftTurn();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::EnableRightTurn))
-            HandleRightTurnOn();
+            EnableRightTurn();
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::DisableTurns))
         {
-            HandleLeftTurnOff();
-            HandleRightTurnOff();
+            DisableLeftTurn();
+            DisableRightTurn();
         }
 
         else if ((MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::Alert)) || IsAlert)
