@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.13.2(E3)
+  Version: 0.14.0
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.13.2(E3)"
+#define __MODULE_VERSION__ "0.14.0"
 
 #include <Arduino.h>
 #include <AltSoftSerial.h>
