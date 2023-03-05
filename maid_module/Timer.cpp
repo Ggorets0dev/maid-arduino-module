@@ -1,6 +1,5 @@
 #include "tools.h"
 
-// * Creating a Timer class with delay
 Timer::Timer(float repetition_time_sec)
 {
     this->time_from_repeat_ms = 0;

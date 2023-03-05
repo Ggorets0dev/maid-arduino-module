@@ -19,7 +19,18 @@ public:
         Response = '#'
     };
 
-    // Codes when developing
+    enum MessageCodes
+    {
+        EmptyCode = 0,
+        SensorReadingEntry = 1,
+        StartSensorReadingsCmd = 2,
+        StopSensorReadingsCmd = 3,
+        ModuleVersionEntry = 4,
+        CurrentDateTimeEntry = 5,
+		ModuleLaunchCmd = 7
+    };
+
+    /* Codes for development
     enum MessageCodes
     {
         EmptyCode = 0,
@@ -33,20 +44,7 @@ public:
         DisableTurns = 8,
         GetNowDate = 9,
 		    InitializationDone = 10
-    };
-
-    /* Codes in the release version
-    enum MessageCodes
-    {
-        EmptyCode = 0,
-        SensorReadingEntry = 1,
-        StartSensorReadingsCmd = 2,
-        StopSensorReadingsCmd = 3,
-        ModuleVersionEntry = 4,
-        CurrentDateTimeEntry = 5,
-		    ModuleLaunchCmd = 6
-    };
-    */
+    }; */
 
     static bool IsRequest(Message &msg);
     static bool IsResponse(Message &msg);

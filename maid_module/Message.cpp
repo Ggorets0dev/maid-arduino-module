@@ -17,7 +17,7 @@ Message::Message(char prefix, int code, String data)
 Message::Message(float speed, float voltage)
 {
     this->prefix = MessageAnalyzer::MessagePrefixes::Response;
-    this->code = MessageAnalyzer::MessageCodes::SendSensorReadings;
+    this->code = MessageAnalyzer::MessageCodes::SensorReadingEntry;
     this->data = String(speed, 2) + "_" + String(voltage, 2);
 }
 
@@ -33,6 +33,7 @@ String Message::ToString() const
     return String(prefix) + "{" + String(code) + "}" + data + ";";
 }
 
+// * Check if the message matches the template 
 bool Message::IsValid(Message msg)
 {
     bool prefix_check = msg.prefix == MessageAnalyzer::MessagePrefixes::EmptyPrefix ||
@@ -40,7 +41,7 @@ bool Message::IsValid(Message msg)
                             msg.prefix == MessageAnalyzer::MessagePrefixes::Response;
 
     bool code_check = msg.code >= MessageAnalyzer::MessageCodes::EmptyCode && 
-                            msg.code <= MessageAnalyzer::MessageCodes::InitializationDone;
+                            msg.code <= MessageAnalyzer::MessageCodes::ModuleLaunchCmd;
 
     bool data_check = msg.data.length() >= 0 && 
                             msg.data.length() <= Message::maximal_message_length;

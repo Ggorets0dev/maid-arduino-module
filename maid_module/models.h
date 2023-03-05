@@ -5,10 +5,8 @@
 #include "tools.h"
 #include "typedefs.h"
 
-
 // ! Declaring classes from other header files in advance
 class MessageAnalyzer;
-
 
 // * Node of linked list with sensor readings
 class Node
@@ -53,6 +51,7 @@ struct Wheel
     Wheel(byte spokes_cnt, uint wheel_circ_mm);
 };
 
+// * Measured speed and voltages and their initial variants
 struct Reading
 {
     int impulse_cnt = 0;

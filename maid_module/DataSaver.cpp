@@ -8,6 +8,7 @@ DataSaver::DataSaver(String readings_filename)
     this->last_write_time = 0;
 }
 
+// * Get the last time the data was written to the drive
 ulong DataSaver::GetLastWriteTime() const
 {
     return this->last_write_time;

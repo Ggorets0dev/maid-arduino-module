@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.14.0
+  Version: 0.15.0
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.14.0"
+#define __MODULE_VERSION__ "0.15.0"
 
 #include <Arduino.h>
 #include <AltSoftSerial.h>
@@ -27,7 +27,6 @@ HardwareSerial &UsbSerial = Serial;
 AltSoftSerial BtSerial;
 
 // NOTE - Variables for LED indicator feeds
-bool IsAlert = false;
 Signal LeftTurning(LEFT_TURN_LAMP_PIN, 1.0f, false);
 Signal RightTurning(RIGHT_TURN_LAMP_PIN, 1.0f, false);
 Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
@@ -59,6 +58,8 @@ void ChangeStateLeftTurn(void)
         LeftTurning.ChangeStateTimer.Disable(); 
     else
         LeftTurning.ChangeStateTimer.Enable();
+
+      UsbSerial.println("[LOG] STATE OF LEFT TURN SIGNAL CHANGED");
 }
 void ChangeStateRightTurn(void)
 {             
@@ -66,37 +67,12 @@ void ChangeStateRightTurn(void)
         RightTurning.ChangeStateTimer.Disable(); 
     else
         RightTurning.ChangeStateTimer.Enable();
+
+    UsbSerial.println("[LOG] STATE OF RIGHT TURN SIGNAL CHANGED");
 }
 void CountImpulse(void) 
 { 
     SpeedSensor.CountImpulse(); 
-}
-// !SECTION
-
-// SECTION - Working with turn signals via codes from control devices
-void DisableLeftTurn(void)
-{             
-    if (LeftTurning.ChangeStateTimer.IsEnabled())
-        LeftTurning.ChangeStateTimer.Disable(); 
-}
-void DisableRightTurn(void)
-{
-    if (RightTurning.ChangeStateTimer.IsEnabled())
-        RightTurning.ChangeStateTimer.Disable();
-}
-void EnableLeftTurn(void) 
-{             
-    if (!LeftTurning.ChangeStateTimer.IsEnabled())
-        LeftTurning.ChangeStateTimer.Enable();
-    
-    DisableRightTurn();
-}
-void EnableRightTurn(void)
-{
-    if (!RightTurning.ChangeStateTimer.IsEnabled())
-        RightTurning.ChangeStateTimer.Enable();
-    
-    DisableLeftTurn();
 }
 // !SECTION
 
@@ -125,12 +101,16 @@ void setup()
         RightTurning.ChangeStateTimer.Enable();
     // !SECTION
 
-    UsbSerial.begin(BAUD);
-    BtSerial.begin(BAUD);
+    UsbSerial.begin(BAUD); BtSerial.begin(BAUD);
     SD.begin(ROM_DATA_PIN);
 
     if (!Memory::InitROM(card, volume, root) || Memory::GetFreeROM(volume) < Memory::minimal_free_rom_size)
+    {
         ErrorOccuring.BlinkForever();
+        UsbSerial.println("[LOG] FAILED TO CONNECT TO THE DRIVE");
+    }
+
+    UsbSerial.println("[LOG] DEVICE IS STARTED");
 }
 
 void loop() 
@@ -153,6 +133,8 @@ void loop()
         {
             SdCard.WriteNodes(head);
             Node::DeleteAll(head);
+
+            UsbSerial.println("[LOG] READINGS ARE RECORDED ON THE DEVICE");
         }
 
         SpeedSensor.ResetCounter(); 
@@ -167,79 +149,53 @@ void loop()
         BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
          
         SendReadingsTimer.ResetTime();
+        
+        UsbSerial.println("[LOG] MESSAGE SENT");
     }
     // !SECTION
 
     // SECTION - Processing of signals from the control device
-    if (BtSerial.available() || IsAlert)
+    if (BtSerial.available())
     {
-        if (BtSerial.available())
-        {
-            msg_temp = BluetoothAdapter::RecieveMessage(BtSerial);
-            
-            if (!Message::IsValid(msg_temp))
-                return;
-        }
-
-        else
+        msg_temp = BluetoothAdapter::RecieveMessage(BtSerial);
+        
+        if (!Message::IsValid(msg_temp))
             msg_temp = Message();
 
 
-        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::InitializationDone))
+        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::ModuleLaunchCmd))
             IsInitialized = true;
 
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StartSensorReadings))
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StartSensorReadingsCmd))
             SendReadingsTimer.Enable();
         
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StopSensorReadings))
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StopSensorReadingsCmd))
             SendReadingsTimer.Disable();
 
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::EnableLeftTurn))
-            EnableLeftTurn();
-
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::EnableRightTurn))
-            EnableRightTurn();
-
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::DisableTurns))
-        {
-            DisableLeftTurn();
-            DisableRightTurn();
-        }
-
-        else if ((MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::Alert)) || IsAlert)
-        {
-            if (!IsAlert)
-            {
-                RightTurning.ChangeStateTimer.Disable();
-                LeftTurning.ChangeStateTimer.Disable();
-                IsAlert = true;
-            }
-
-            else
-            {
-                LeftTurning.ChangeStateTimer.Enable();
-                RightTurning.ChangeStateTimer.Enable();
-                IsAlert = false;
-            }  
-        }
-
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::CurrentDateTimeEntry))
         {   
             if (SdCard.TrySetDateTime(msg_temp.data))
             {
                 SdCard.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
                 millis_passed.initialization_time_ms = millis();
+                
                 if (!IsInitialized)
                 {                    
-                    msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::SendModuleVersion, __MODULE_VERSION__);
+                    msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::ModuleVersionEntry, __MODULE_VERSION__);
                     BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
+
+                    UsbSerial.println("[LOG] MESSAGE SENT");
                 }
                 else if (Node::node_cnt != 0)
                 {
                     Node::DeleteAll(head);
                 }
+
+                UsbSerial.println("[LOG] HEADER IS RECORDED ON THE DEVICE");
             }
         }
+
+        UsbSerial.println("[LOG] MESSAGE RECEIVED");
     }
     // !SECTION
 

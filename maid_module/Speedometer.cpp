@@ -18,6 +18,7 @@ void Speedometer::ResetCounter()
     this->impulse_counter = 0; 
 }
 
+// * Get the number of counted pulses
 int Speedometer::GetImpulseCount() const
 {
     return this->impulse_counter;

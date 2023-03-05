@@ -42,6 +42,7 @@ void Signal::TryBlink()
     }
 }
 
+// * Transition to infinite blink to indicate a critical situation
 void Signal::BlinkForever(float multiplier=1.0f) const
 {
 	float delay_ms = ChangeStateTimer.GetRepeatTime() * multiplier * 1000.0f;
