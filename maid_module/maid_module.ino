@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.13.2(E2)
+  Version: 0.13.2(E3)
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.13.2(E2)"
+#define __MODULE_VERSION__ "0.13.2(E3)"
 
 #include <Arduino.h>
 #include <AltSoftSerial.h>
@@ -37,7 +37,7 @@ Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 bool IsInitialized = false;
 Timer SendReadingsTimer(2.0f);
 Timer SaveReadingsTimer(0.5f);
-Logging Logger("data.txt");
+DataSaver SdCard("data.txt");
 MillisTracker millis_passed;
 Sd2Card card;
 SdVolume volume;
@@ -151,7 +151,7 @@ void loop()
 
         if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRAM() < Memory::minimal_free_ram_size)
         {
-            Logger.WriteNodes(head);
+            SdCard.WriteNodes(head);
             Node::DeleteAll(head);
         }
 
@@ -164,7 +164,6 @@ void loop()
     if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled() && IsInitialized) 
     { 
         msg_temp = Message(last_reading.speed_kmh, last_reading.voltage_v);
-
         BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
          
         SendReadingsTimer.ResetTime();
@@ -226,9 +225,9 @@ void loop()
 
         else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::GetNowDate))
         {   
-            if (Logger.TrySetDateTime(msg_temp.data))
+            if (SdCard.TrySetDateTime(msg_temp.data))
             {
-                Logger.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
+                SdCard.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
                 millis_passed.initialization_time_ms = millis();
                 if (!IsInitialized)
                 {                    
@@ -245,10 +244,10 @@ void loop()
     // !SECTION
 
     // SECTION - Flashing LEDs and turn signals
-    if (SdCardSaving.IsInReactionInterval(Logger.GetLastWriteTime()) && !SdCardSaving.ChangeStateTimer.IsEnabled())
+    if (SdCardSaving.IsInReactionInterval(SdCard.GetLastWriteTime()) && !SdCardSaving.ChangeStateTimer.IsEnabled())
         SdCardSaving.ChangeStateTimer.Enable();
     
-    else if (!SdCardSaving.IsInReactionInterval(Logger.GetLastWriteTime()) && SdCardSaving.ChangeStateTimer.IsEnabled())
+    else if (!SdCardSaving.IsInReactionInterval(SdCard.GetLastWriteTime()) && SdCardSaving.ChangeStateTimer.IsEnabled())
         SdCardSaving.ChangeStateTimer.Disable();
 
     LeftTurning.TryBlink();

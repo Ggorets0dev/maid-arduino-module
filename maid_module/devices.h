@@ -59,7 +59,7 @@ public:
 };
 
 // * Provides work with files (sd-card)
-class Logging
+class DataSaver
 {
 private:
     static constexpr uint date_time_length = 19; // dd.MM.yyyy-HH:mm:ss
@@ -67,7 +67,7 @@ private:
     String readings_filename;
     ulong last_write_time;
 public:
-    Logging(String readings_filename);
+    DataSaver(String readings_filename);
     ulong GetLastWriteTime() const;
     bool TrySetDateTime(String date_time);
     void WriteNodes(Node* head);

@@ -1,22 +1,22 @@
 #include "devices.h"
 
-// * Creating Logging class with initial name of file
-Logging::Logging(String readings_filename)
+// * Creating DataSaver class with initial name of file
+DataSaver::DataSaver(String readings_filename)
 {
     this->date_time = EMPTY_STRING;
     this->readings_filename = readings_filename;
     this->last_write_time = 0;
 }
 
-ulong Logging::GetLastWriteTime() const
+ulong DataSaver::GetLastWriteTime() const
 {
     return this->last_write_time;
 }
 
 // * Try to set date of today, get it from app
-bool Logging::TrySetDateTime(String date_time)
+bool DataSaver::TrySetDateTime(String date_time)
 {
-   if (date_time.length() != Logging::date_time_length)
+   if (date_time.length() != DataSaver::date_time_length)
        return false;
 
    int time_inx;
@@ -49,7 +49,7 @@ bool Logging::TrySetDateTime(String date_time)
 }
 
 // * Write all readings to file
-void Logging::WriteNodes(Node* head)
+void DataSaver::WriteNodes(Node* head)
 {
     File readings_file = SD.open(readings_filename, FILE_WRITE);
     
@@ -68,7 +68,7 @@ void Logging::WriteNodes(Node* head)
 }
 
 // * Create header of readings in file
-void Logging::WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer)
+void DataSaver::WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer)
 {
     String header = "{H} " + date_time + " ( " + String(wheel.count_of_spokes) + " | " + String(wheel.wheel_circumference_mm) + " | " + String(voltmeter.GetMaxVoltage()) + " | "+ String(save_readings_timer.GetRepeatTime()) + " )";
 

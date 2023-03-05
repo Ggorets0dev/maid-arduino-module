@@ -5,10 +5,8 @@
 #include "models.h"
 #include "typedefs.h"
 
-
 // ! Declaring classes from other header files in advance
 class Message;
-
 
 // * Checking inforamtion about transfered message
 class MessageAnalyzer
@@ -20,6 +18,8 @@ public:
         Request = '$',
         Response = '#'
     };
+
+    // Codes when developing
     enum MessageCodes
     {
         EmptyCode = 0,
@@ -34,6 +34,19 @@ public:
         GetNowDate = 9,
 		    InitializationDone = 10
     };
+
+    /* Codes in the release version
+    enum MessageCodes
+    {
+        EmptyCode = 0,
+        SensorReadingEntry = 1,
+        StartSensorReadingsCmd = 2,
+        StopSensorReadingsCmd = 3,
+        ModuleVersionEntry = 4,
+        CurrentDateTimeEntry = 5,
+		    ModuleLaunchCmd = 6
+    };
+    */
 
     static bool IsRequest(Message &msg);
     static bool IsResponse(Message &msg);
