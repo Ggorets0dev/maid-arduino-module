@@ -29,7 +29,7 @@ public:
 class Message
 {
 public:
-    static constexpr uint maximal_message_length = 25;
+    static const uint maximal_message_length = 25;
     char prefix;
     int code;
     String data;
@@ -39,7 +39,7 @@ public:
     Message(float speed, float voltage);
     Message();
     String ToString() const;
-    static bool IsValid(Message msg);
+    static bool IsValid(const Message &msg);
 };
 
 // * Wheel used in motorcycle

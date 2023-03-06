@@ -34,16 +34,16 @@ String Message::ToString() const
 }
 
 // * Check if the message matches the template 
-bool Message::IsValid(Message msg)
+bool Message::IsValid(const Message &msg)
 {
-    bool prefix_check = msg.prefix == MessageAnalyzer::MessagePrefixes::EmptyPrefix ||
+    const bool prefix_check = msg.prefix == MessageAnalyzer::MessagePrefixes::EmptyPrefix ||
                             msg.prefix == MessageAnalyzer::MessagePrefixes::Request ||
                             msg.prefix == MessageAnalyzer::MessagePrefixes::Response;
 
-    bool code_check = msg.code >= MessageAnalyzer::MessageCodes::EmptyCode && 
+    const bool code_check = msg.code >= MessageAnalyzer::MessageCodes::EmptyCode && 
                             msg.code <= MessageAnalyzer::MessageCodes::ModuleLaunchCmd;
 
-    bool data_check = msg.data.length() >= 0 && 
+    const bool data_check = msg.data.length() >= 0 && 
                             msg.data.length() <= Message::maximal_message_length;
 
     return prefix_check && code_check && data_check;

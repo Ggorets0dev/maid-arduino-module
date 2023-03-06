@@ -23,7 +23,7 @@ float Timer::GetRepeatTime() const
 // * Checking if delay is ended
 bool Timer::IsPassed() const
 {
-    return ((float)millis() - (float)time_from_repeat_ms) / 1000.0f >= repetition_time_sec;
+    return ((float)millis() - (float)this->time_from_repeat_ms) / 1000.0f >= this->repetition_time_sec;
 }
 
 // * Check if time counting is enabled

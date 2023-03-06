@@ -2,5 +2,5 @@
 
 ulong MillisTracker::operator()()
 {
-    return millis() - initialization_time_ms;
+    return millis() - this->initialization_time_ms;
 }

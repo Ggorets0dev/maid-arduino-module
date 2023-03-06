@@ -25,11 +25,11 @@ int Speedometer::GetImpulseCount() const
 }
 
 // * Calculate speed with spoke count and time elapsed, parameters of wheel needed
-float Speedometer::CalculateSpeed(float time_spent_sec, Wheel &wheel) const
+float Speedometer::CalculateSpeed(float time_spent_sec, const Wheel &wheel) const
 {
     if (impulse_counter != 0) 
     {
-        float speed = ((float)impulse_counter / (float)wheel.count_of_spokes * (float)wheel.wheel_circumference_mm / 1000000.0f) * (60.0f * 60.0f / time_spent_sec);
+        const float speed = ((float)this->impulse_counter / (float)wheel.count_of_spokes * (float)wheel.wheel_circumference_mm / 1000000.0f) * (60.0f * 60.0f / time_spent_sec);
         return speed;
     }
     else 

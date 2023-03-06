@@ -27,7 +27,7 @@ public:
         StopSensorReadingsCmd = 3,
         ModuleVersionEntry = 4,
         CurrentDateTimeEntry = 5,
-		ModuleLaunchCmd = 7
+		    ModuleLaunchCmd = 7
     };
 
     /* Codes for development
@@ -46,9 +46,9 @@ public:
 		    InitializationDone = 10
     }; */
 
-    static bool IsRequest(Message &msg);
-    static bool IsResponse(Message &msg);
-    static bool IsCodeMatch(Message &msg, MessageCodes code);
+    static bool IsRequest(const Message &msg);
+    static bool IsResponse(const Message &msg);
+    static bool IsCodeMatch(const Message &msg, MessageCodes code);
 };
 
 // * Create delay between same commands
@@ -87,4 +87,20 @@ class MillisTracker
 public:
     ulong initialization_time_ms = 0;
     ulong operator ()();
+};
+
+// * Event information output for work tracking
+class Logger
+{
+private:
+    static const HardwareSerial &LogSerial = Serial;
+    static const char* const note = "[LOG]";
+
+    static String MakeLog(String log);
+public:
+    static void LogTurnStateChanged(const char* turn);
+    static void LogMsgSent();
+    static void LogMsgRecived();
+    static void LogReadingsSaved();
+    static void LogHeaderSaved();
 };

@@ -2,11 +2,11 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.15.0
+  Version: 0.16.0
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.15.0"
+#define __MODULE_VERSION__ "0.16.0"
 
 #include <Arduino.h>
 #include <AltSoftSerial.h>
@@ -22,21 +22,21 @@ Reading last_reading;
 Message msg_temp;
 
 // NOTE - Setting up transfer ports
-const uint BAUD = 9600; 
-HardwareSerial &UsbSerial = Serial;
-AltSoftSerial BtSerial;
+const uint BAUD = 9600;
+const HardwareSerial &UsbSerial = Serial; 
+const AltSoftSerial BtSerial;
 
 // NOTE - Variables for LED indicator feeds
-Signal LeftTurning(LEFT_TURN_LAMP_PIN, 1.0f, false);
-Signal RightTurning(RIGHT_TURN_LAMP_PIN, 1.0f, false);
-Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
-Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
+const Signal LeftTurning(LEFT_TURN_LAMP_PIN, 1.0f, false);
+const Signal RightTurning(RIGHT_TURN_LAMP_PIN, 1.0f, false);
+const Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
+const Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 
 // NOTE - Setting up to transmit and save readings
 bool IsInitialized = false;
-Timer SendReadingsTimer(2.0f);
-Timer SaveReadingsTimer(0.5f);
-DataSaver SdCard("data.txt");
+const Timer SendReadingsTimer(2.0f);
+const Timer SaveReadingsTimer(0.5f);
+const DataSaver SdCard("data.txt");
 MillisTracker millis_passed;
 Sd2Card card;
 SdVolume volume;
@@ -47,9 +47,9 @@ uint Node::node_cnt = 0;
 Node* head = NULL;
 
 // NOTE - Setting up devices to receive and calculate data
-Wheel FrontWheel(8, 2070);
-Voltmeter VoltageSensor(60);
-Speedometer SpeedSensor(0);
+const Wheel FrontWheel(8, 2070);
+const Voltmeter VoltageSensor(60);
+const Speedometer SpeedSensor(0);
 
 // SECTION - Interruption handlers
 void ChangeStateLeftTurn(void)
@@ -59,7 +59,7 @@ void ChangeStateLeftTurn(void)
     else
         LeftTurning.ChangeStateTimer.Enable();
 
-      UsbSerial.println("[LOG] STATE OF LEFT TURN SIGNAL CHANGED");
+    Logger::LogTurnStateChanged("LEFT");
 }
 void ChangeStateRightTurn(void)
 {             
@@ -68,7 +68,7 @@ void ChangeStateRightTurn(void)
     else
         RightTurning.ChangeStateTimer.Enable();
 
-    UsbSerial.println("[LOG] STATE OF RIGHT TURN SIGNAL CHANGED");
+    Logger::LogTurnStateChanged("RIGHT");
 }
 void CountImpulse(void) 
 { 
@@ -105,12 +105,7 @@ void setup()
     SD.begin(ROM_DATA_PIN);
 
     if (!Memory::InitROM(card, volume, root) || Memory::GetFreeROM(volume) < Memory::minimal_free_rom_size)
-    {
         ErrorOccuring.BlinkForever();
-        UsbSerial.println("[LOG] FAILED TO CONNECT TO THE DRIVE");
-    }
-
-    UsbSerial.println("[LOG] DEVICE IS STARTED");
 }
 
 void loop() 
@@ -134,7 +129,7 @@ void loop()
             SdCard.WriteNodes(head);
             Node::DeleteAll(head);
 
-            UsbSerial.println("[LOG] READINGS ARE RECORDED ON THE DEVICE");
+            Logger::LogReadingsSaved();
         }
 
         SpeedSensor.ResetCounter(); 
@@ -150,7 +145,7 @@ void loop()
          
         SendReadingsTimer.ResetTime();
         
-        UsbSerial.println("[LOG] MESSAGE SENT");
+        Logger::LogMsgSent();
     }
     // !SECTION
 
@@ -184,18 +179,18 @@ void loop()
                     msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::ModuleVersionEntry, __MODULE_VERSION__);
                     BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
 
-                    UsbSerial.println("[LOG] MESSAGE SENT");
+                    Logger::LogMsgSent();
                 }
                 else if (Node::node_cnt != 0)
                 {
                     Node::DeleteAll(head);
                 }
 
-                UsbSerial.println("[LOG] HEADER IS RECORDED ON THE DEVICE");
+                Logger::LogHeaderSaved();
             }
         }
-
-        UsbSerial.println("[LOG] MESSAGE RECEIVED");
+        
+        Logger::LogMsgRecived();
     }
     // !SECTION
 

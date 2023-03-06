@@ -1,7 +1,7 @@
 #include "devices.h"
 
 // * Creating Signal class with it's blink settings
-Signal::Signal(uint led_pin, float delay_sec, bool enabled, float reaction_interval_sec=1.0f)
+Signal::Signal(byte led_pin, float delay_sec, bool enabled, float reaction_interval_sec=1.0f)
 {
     this->led_pin = led_pin;
     this->is_shining = false;
@@ -15,8 +15,8 @@ Signal::Signal(uint led_pin, float delay_sec, bool enabled, float reaction_inter
 // * Checks if time is in device's reaction interval
 bool Signal::IsInReactionInterval(ulong time) const
 {
-    float reaction_interval_ms = reaction_interval_sec * 1000.0f;
-    float time_difference_ms = abs((float)millis() - reaction_interval_ms);
+    const float reaction_interval_ms = this->reaction_interval_sec * 1000.0f;
+    const float time_difference_ms = abs((float)millis() - reaction_interval_ms);
     
     return (float)time > time_difference_ms;
 }
@@ -31,21 +31,21 @@ void Signal::TryBlink()
         else
             digitalWrite(led_pin, HIGH);
         
-        is_shining = !is_shining;
+        this->is_shining = !this->is_shining;
         ChangeStateTimer.ResetTime();
     }
 
-    else if (!ChangeStateTimer.IsEnabled() && is_shining)
+    else if (!ChangeStateTimer.IsEnabled() && this->is_shining)
     {
         digitalWrite(led_pin, LOW);
-        is_shining = false;
+        this->is_shining = false;
     }
 }
 
 // * Transition to infinite blink to indicate a critical situation
 void Signal::BlinkForever(float multiplier=1.0f) const
 {
-	float delay_ms = ChangeStateTimer.GetRepeatTime() * multiplier * 1000.0f;
+	  const float delay_ms = this->ChangeStateTimer.GetRepeatTime() * multiplier * 1000.0f;
     while (true)
     {
         digitalWrite(led_pin, HIGH);

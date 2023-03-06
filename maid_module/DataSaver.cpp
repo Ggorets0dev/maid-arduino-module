@@ -52,7 +52,7 @@ bool DataSaver::TrySetDateTime(String date_time)
 // * Write all readings to file
 void DataSaver::WriteNodes(Node* head)
 {
-    File readings_file = SD.open(readings_filename, FILE_WRITE);
+    File readings_file = SD.open(this->readings_filename, FILE_WRITE);
     
     Node* current = head;
     String reading;
@@ -69,11 +69,11 @@ void DataSaver::WriteNodes(Node* head)
 }
 
 // * Create header of readings in file
-void DataSaver::WriteHeader(Voltmeter &voltmeter, Wheel &wheel, Timer &save_readings_timer)
+void DataSaver::WriteHeader(const Voltmeter &voltmeter, const Wheel &wheel, const Timer &save_readings_timer)
 {
-    String header = "{H} " + date_time + " ( " + String(wheel.count_of_spokes) + " | " + String(wheel.wheel_circumference_mm) + " | " + String(voltmeter.GetMaxVoltage()) + " | "+ String(save_readings_timer.GetRepeatTime()) + " )";
+    const String header = "{H} " + date_time + " ( " + String(wheel.count_of_spokes) + " | " + String(wheel.wheel_circumference_mm) + " | " + String(voltmeter.GetMaxVoltage()) + " | "+ String(save_readings_timer.GetRepeatTime()) + " )";
 
-    File readings_file = SD.open(readings_filename, FILE_WRITE);
+    File readings_file = SD.open(this->readings_filename, FILE_WRITE);
     readings_file.println(header);
     readings_file.close();
 
