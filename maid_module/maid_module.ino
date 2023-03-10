@@ -2,15 +2,16 @@
   Project: MaidModule
   Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.16.0
+  Version: 0.16.1
   GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.16.0"
+#define __MODULE_VERSION__ "0.16.1"
 
 #include <Arduino.h>
 #include <AltSoftSerial.h>
 #include "PinChangeInterrupt.h"
+#include "config.h"
 #include "pinout.h"
 #include "typedefs.h"
 #include "models.h" 
@@ -22,20 +23,19 @@ Reading last_reading;
 Message msg_temp;
 
 // NOTE - Setting up transfer ports
-const uint BAUD = 9600;
 const HardwareSerial &UsbSerial = Serial; 
 const AltSoftSerial BtSerial;
 
 // NOTE - Variables for LED indicator feeds
-const Signal LeftTurning(LEFT_TURN_LAMP_PIN, 1.0f, false);
-const Signal RightTurning(RIGHT_TURN_LAMP_PIN, 1.0f, false);
+const Signal LeftTurning(LEFT_TURN_LAMP_PIN, (float)TURN_SIGNAL_FLASH_DELAY_SEC, false);
+const Signal RightTurning(RIGHT_TURN_LAMP_PIN, (float)TURN_SIGNAL_FLASH_DELAY_SEC, false);
 const Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
 const Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 
 // NOTE - Setting up to transmit and save readings
 bool IsInitialized = false;
-const Timer SendReadingsTimer(2.0f);
-const Timer SaveReadingsTimer(0.5f);
+const Timer SendReadingsTimer((float)SEND_DELAY_SEC);
+const Timer SaveReadingsTimer((float)SAVE_DELAY_SEC);
 const DataSaver SdCard("data.txt");
 MillisTracker millis_passed;
 Sd2Card card;
@@ -47,9 +47,9 @@ uint Node::node_cnt = 0;
 Node* head = NULL;
 
 // NOTE - Setting up devices to receive and calculate data
-const Wheel FrontWheel(8, 2070);
-const Voltmeter VoltageSensor(60);
-const Speedometer SpeedSensor(0);
+const Wheel FrontWheel(WHEEL_SPOKES_CNT, WHEEL_CIRCUMFERENCE_MM);
+const Voltmeter VoltageSensor(MAX_VOLTAGE_V);
+const Speedometer SpeedSensor;
 
 // SECTION - Interruption handlers
 void ChangeStateLeftTurn(void)

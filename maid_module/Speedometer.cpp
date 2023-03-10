@@ -1,9 +1,9 @@
 #include "devices.h"
 
 // * Creatings speedometer with initial impusle count
-Speedometer::Speedometer(uint impulse_cnt)
+Speedometer::Speedometer()
 {
-    this->impulse_counter = impulse_cnt;
+    this->impulse_counter = 0;
 }
 
 // * Increase the counter reading after passing the spoke of wheel

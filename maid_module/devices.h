@@ -22,7 +22,7 @@ class Speedometer
 private:
     uint impulse_counter;
 public:
-    Speedometer(uint impulse_cnt);
+    Speedometer();
     float CalculateSpeed(float time_spent_sec, const Wheel &wheel) const;
     int GetImpulseCount() const;
     void CountImpulse();
