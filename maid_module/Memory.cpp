@@ -4,19 +4,16 @@ extern int __bss_end;
 extern void *__brkval;
 
 // * Check the availability of the drive
-bool Memory::InitROM(Sd2Card &card, SdVolume &volume, SdFile &root)
+bool Memory::InitializeRom(Sd2Card &card, SdVolume &volume, SdFile &root)
 { 
-    if (!card.init(SPI_HALF_SPEED, ROM_DATA_PIN))
+    if (card.init(SPI_HALF_SPEED, ROM_DATA_PIN) || !volume.init(card))
         return false;
-
-	else if (!volume.init(card))
-        return false;
-  
-    return true;
+    else
+        return true;
 }
 
 // * Get the amount of free dynamic memory
-uint Memory::GetFreeRAM()
+uint Memory::GetFreeRam()
 {
     int free_memory;
     
@@ -28,7 +25,7 @@ uint Memory::GetFreeRAM()
 }
 
 // * Get the amount of free static memory
-uint Memory::GetFreeROM(SdVolume &volume)
+uint Memory::GetFreeRom(SdVolume &volume)
 {
     File root = SD.open("/");
 
@@ -51,5 +48,7 @@ uint Memory::GetFreeROM(SdVolume &volume)
     }
     root.close();
     
-    return ((volume.blocksPerCluster() * volume.clusterCount() * 512) - used_space) / 1024 / 1024;
+    const ulong left_space = ((volume.blocksPerCluster() * volume.clusterCount() * 512) - used_space) / pow(1024, 2);
+
+    return left_space;
 }

@@ -1,22 +1,25 @@
 /*
   Project: MaidModule
-  Repository: maid-arduino-module
   Developer: Ggorets0dev
-  Version: 0.16.1
-  GitHub page: https://github.com/Ggorets0dev/maid-arduino-module
+  Version: 0.16.2
+  GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.16.1"
+#define __MODULE_VERSION__ "0.16.2"
+
 
 #include <Arduino.h>
 #include <AltSoftSerial.h>
 #include "PinChangeInterrupt.h"
+
 #include "config.h"
 #include "pinout.h"
 #include "typedefs.h"
+
 #include "models.h" 
 #include "devices.h"
 #include "tools.h"
+
 
 // NOTE - Variables-buffers for temporary storage
 Reading last_reading;
@@ -27,15 +30,15 @@ const HardwareSerial &UsbSerial = Serial;
 const AltSoftSerial BtSerial;
 
 // NOTE - Variables for LED indicator feeds
-const Signal LeftTurning(LEFT_TURN_LAMP_PIN, (float)TURN_SIGNAL_FLASH_DELAY_SEC, false);
-const Signal RightTurning(RIGHT_TURN_LAMP_PIN, (float)TURN_SIGNAL_FLASH_DELAY_SEC, false);
+const Signal LeftTurning(LEFT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false);
+const Signal RightTurning(RIGHT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false);
 const Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
 const Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 
 // NOTE - Setting up to transmit and save readings
-bool IsInitialized = false;
-const Timer SendReadingsTimer((float)SEND_DELAY_SEC);
-const Timer SaveReadingsTimer((float)SAVE_DELAY_SEC);
+bool is_initialized = false;
+const Timer SendReadingsTimer(static_cast<float>(SEND_DELAY_SEC));
+const Timer SaveReadingsTimer(static_cast<float>(SAVE_DELAY_SEC));
 const DataSaver SdCard("data.txt");
 MillisTracker millis_passed;
 Sd2Card card;
@@ -44,7 +47,7 @@ SdFile root;
 
 // NOTE - Setting up a single-link list for storing information
 uint Node::node_cnt = 0;
-Node* head = NULL;
+Node* head = nullptr;
 
 // NOTE - Setting up devices to receive and calculate data
 const Wheel FrontWheel(WHEEL_SPOKES_CNT, WHEEL_CIRCUMFERENCE_MM);
@@ -52,7 +55,7 @@ const Voltmeter VoltageSensor(MAX_VOLTAGE_V);
 const Speedometer SpeedSensor;
 
 // SECTION - Interruption handlers
-void ChangeStateLeftTurn(void)
+void ChangeStateLeftTurn()
 {             
     if (LeftTurning.ChangeStateTimer.IsEnabled())
         LeftTurning.ChangeStateTimer.Disable(); 
@@ -61,7 +64,7 @@ void ChangeStateLeftTurn(void)
 
     Logger::LogTurnStateChanged("LEFT");
 }
-void ChangeStateRightTurn(void)
+void ChangeStateRightTurn()
 {             
     if (RightTurning.ChangeStateTimer.IsEnabled())
         RightTurning.ChangeStateTimer.Disable(); 
@@ -70,7 +73,7 @@ void ChangeStateRightTurn(void)
 
     Logger::LogTurnStateChanged("RIGHT");
 }
-void CountImpulse(void) 
+void CountImpulse() 
 { 
     SpeedSensor.CountImpulse(); 
 }
@@ -95,23 +98,23 @@ void setup()
     // !SECTION
 
     // SECTION - Installing the original state of the turn signals
-    if (!(bool)digitalRead(LEFT_TURN_BUTTON_PIN))
+    if (!static_cast<bool>(digitalRead(LEFT_TURN_BUTTON_PIN)))
         LeftTurning.ChangeStateTimer.Enable();
-    if (!(bool)digitalRead(RIGHT_TURN_BUTTON_PIN))
+    if (!static_cast<bool>(digitalRead(RIGHT_TURN_BUTTON_PIN)))
         RightTurning.ChangeStateTimer.Enable();
     // !SECTION
 
     UsbSerial.begin(BAUD); BtSerial.begin(BAUD);
     SD.begin(ROM_DATA_PIN);
 
-    if (!Memory::InitROM(card, volume, root) || Memory::GetFreeROM(volume) < Memory::minimal_free_rom_size)
+    if (!Memory::InitializeRom(card, volume, root) || Memory::GetFreeRom(volume) < Memory::minimal_free_rom_size)
         ErrorOccuring.BlinkForever();
 }
 
 void loop() 
 {
     // SECTION - Saving data and then writing them to a file
-    if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled() && IsInitialized)
+    if (SaveReadingsTimer.IsPassed() && SaveReadingsTimer.IsEnabled() && is_initialized)
     {
         last_reading.impulse_cnt = SpeedSensor.GetImpulseCount();
         last_reading.analog_voltage = analogRead(VOLTMETER_PIN);
@@ -124,7 +127,7 @@ void loop()
         else
             Node::Insert(head, last_reading.impulse_cnt, last_reading.analog_voltage, millis_passed());
 
-        if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRAM() < Memory::minimal_free_ram_size)
+        if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRam() < Memory::minimal_free_ram_size)
         {
             SdCard.WriteNodes(head);
             Node::DeleteAll(head);
@@ -138,7 +141,7 @@ void loop()
     // !SECTION
 
     // SECTION - Output the last calculated value to the user
-    if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled() && IsInitialized) 
+    if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled() && is_initialized) 
     { 
         msg_temp = Message(last_reading.speed_kmh, last_reading.voltage_v);
         BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
@@ -158,25 +161,25 @@ void loop()
             msg_temp = Message();
 
 
-        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::ModuleLaunchCmd))
-            IsInitialized = true;
+        if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::LAUNCH_MODULE_CMD))
+            is_initialized = true;
 
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StartSensorReadingsCmd))
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::START_SENSOR_READINGS_CMD))
             SendReadingsTimer.Enable();
         
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::StopSensorReadingsCmd))
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::STOP_SENSOR_READINGS_CMD))
             SendReadingsTimer.Disable();
 
-        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::CurrentDateTimeEntry))
+        else if (MessageAnalyzer::IsRequest(msg_temp) && MessageAnalyzer::IsCodeMatch(msg_temp, MessageAnalyzer::MessageCodes::CURRENT_DATETIME_ENTRY))
         {   
             if (SdCard.TrySetDateTime(msg_temp.data))
             {
                 SdCard.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
                 millis_passed.initialization_time_ms = millis();
                 
-                if (!IsInitialized)
+                if (!is_initialized)
                 {                    
-                    msg_temp = Message(MessageAnalyzer::MessagePrefixes::Response, MessageAnalyzer::MessageCodes::ModuleVersionEntry, __MODULE_VERSION__);
+                    msg_temp = Message(MessageAnalyzer::MessagePrefixes::RESPONSE, MessageAnalyzer::MessageCodes::MODULE_VERSION_ENTRY, __MODULE_VERSION__);
                     BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
 
                     Logger::LogMsgSent();

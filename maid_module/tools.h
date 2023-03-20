@@ -14,20 +14,20 @@ class MessageAnalyzer
 public:
     enum MessagePrefixes
     {
-        EmptyPrefix = '?',
-        Request = '$',
-        Response = '#'
+        EMPTY_PREFIX = '?',
+        REQUEST = '$',
+        RESPONSE = '#'
     };
 
     enum MessageCodes
     {
-        EmptyCode = 0,
-        SensorReadingEntry = 1,
-        StartSensorReadingsCmd = 2,
-        StopSensorReadingsCmd = 3,
-        ModuleVersionEntry = 4,
-        CurrentDateTimeEntry = 5,
-		    ModuleLaunchCmd = 7
+        EMPTY_CODE = 0,
+        SENSOR_READING_ENTRY = 1,
+        START_SENSOR_READINGS_CMD = 2,
+        STOP_SENSOR_READINGS_CMD = 3,
+        MODULE_VERSION_ENTRY = 4,
+        CURRENT_DATETIME_ENTRY = 5,
+		    LAUNCH_MODULE_CMD = 7
     };
 
     /* Codes for development
@@ -76,9 +76,9 @@ public:
     static const byte minimal_free_ram_size = 75; // bytes
     static const byte minimal_free_rom_size = 10; // megabytes
     
-    static bool InitROM(Sd2Card &card, SdVolume &volume, SdFile &root);
-    static uint GetFreeRAM(); // bytes
-    static uint GetFreeROM(SdVolume &volume); // megabytes
+    static bool InitializeRom(Sd2Card &card, SdVolume &volume, SdFile &root);
+    static uint GetFreeRam(); // bytes
+    static uint GetFreeRom(SdVolume &volume); // megabytes
 };
 
 // * Getting the number of milliseconds that have elapsed since the header was recorded

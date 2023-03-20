@@ -34,12 +34,13 @@ public:
     int code;
     String data;
 
+    static bool IsValid(const Message &msg);
+
     Message(String msg);
     Message(char prefix, int code, String data);
     Message(float speed, float voltage);
     Message();
     String ToString() const;
-    static bool IsValid(const Message &msg);
 };
 
 // * Wheel used in motorcycle
