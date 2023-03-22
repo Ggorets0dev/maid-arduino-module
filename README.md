@@ -17,6 +17,7 @@ Module based on the Arduino made with C++, which collects motorcycle data and pa
 List of third-party libraries used in the sketch:
 
 * [PinChangeInterrupt](https://www.arduino.cc/reference/en/libraries/pinchangeinterrupt/)
+* [AltSoftSerial](https://reference.arduino.cc/reference/en/libraries/altsoftserial/)
   
 ### **Manual**
 

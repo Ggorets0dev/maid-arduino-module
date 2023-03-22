@@ -56,7 +56,7 @@ void DataSaver::WriteNodes(Node* head)
     
     Node* current = head;
     String reading;
-    while (current != NULL)
+    while (current != nullptr)
     {
         reading = "{R} " + String(current->time) + " | " + String(current->impulse_cnt) + " | " + String(current->analog_voltage);
         readings_file.println(reading);

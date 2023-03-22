@@ -29,7 +29,7 @@ float Speedometer::CalculateSpeed(float time_spent_sec, const Wheel &wheel) cons
 {
     if (impulse_counter != 0) 
     {
-        const float speed = (static_cast<float>(this->impulse_counter) / static_cast<float>(wheel.count_of_spokes) * static_cast<float>(wheel.wheel_circumference_mm) / 1000000.0f) * (60.0f * 60.0f / time_spent_sec);
+        const float speed = (static_cast<float>(this->impulse_counter) / static_cast<float>(wheel.count_of_spokes) * static_cast<float>(wheel.wheel_circumference_mm) / pow(10, 6)) * (pow(60, 2) / time_spent_sec);
         return speed;
     }
     else 
