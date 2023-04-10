@@ -7,13 +7,6 @@ Message::Message(String msg)
     this->data = msg.substring(msg.indexOf("}") + 1, msg.indexOf(";"));
 }
 
-Message::Message(char prefix, int code, String data)
-{
-    this->prefix = prefix;
-    this->code = code;
-    this->data = data;
-}
-
 Message::Message(float speed, float voltage)
 {
     this->prefix = MessageAnalyzer::MessagePrefixes::RESPONSE;

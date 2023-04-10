@@ -1,14 +1,5 @@
 #include "models.h"
 
-// * Create Node example with readings inside
-Node::Node(int impulse_cnt, int analog_voltage, ulong millis)
-{
-    this->impulse_cnt = impulse_cnt;
-    this->analog_voltage = analog_voltage;
-    this->time = millis;
-    this->next = nullptr;
-}
-
 // * Create head of linked list
 Node* Node::CreateHead(int impulse_cnt, int analog_voltage, ulong millis)
 {

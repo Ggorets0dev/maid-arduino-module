@@ -2,6 +2,7 @@
 
 #include <SD.h>
 #include <SPI.h>
+#include <AltSoftSerial.h>
 #include "models.h"
 #include "typedefs.h"
 
@@ -58,6 +59,7 @@ private:
     ulong time_from_repeat_ms;
     float repetition_time_sec;
     bool is_enabled;
+    
 public:
     Timer(float repetition_time_sec);
     Timer();
@@ -84,8 +86,12 @@ public:
 // * Getting the number of milliseconds that have elapsed since the header was recorded
 class MillisTracker
 {
+private:
+    ulong mark_time_ms;
+    
 public:
-    ulong initialization_time_ms = 0;
+    MillisTracker() : mark_time_ms(0) {};
+    void SetMark(ulong time_ms);
     ulong operator ()();
 };
 
@@ -93,14 +99,14 @@ public:
 class Logger
 {
 private:
-    static const HardwareSerial &LogSerial = Serial;
-    static const char* const note = "[LOG]";
-
-    static String MakeLog(String log);
+    HardwareSerial &LogSerial;
+    String MakeLog(String log);
+    
 public:
-    static void LogTurnStateChanged(const char* turn);
-    static void LogMsgSent();
-    static void LogMsgRecived();
-    static void LogReadingsSaved();
-    static void LogHeaderSaved();
+    Logger(HardwareSerial &HardSerial) : LogSerial(HardSerial) {}
+    void LogTurnStateChanged(const char* turn);
+    void LogMsgSent();
+    void LogMsgRecived();
+    void LogReadingsSaved();
+    void LogHeaderSaved();
 };

@@ -19,7 +19,7 @@ public:
     ulong time;
     Node* next;
 
-    Node(int impulse_cnt, int analog_voltage, ulong millis);
+    Node(int impulse_cnt, int analog_voltage, ulong millis) : impulse_cnt(impulse_cnt), analog_voltage(analog_voltage), time(millis), next(nullptr) {};
     static Node* CreateHead(int impulse_cnt, int analog_voltage, ulong millis);
     static void Insert(Node* head, int impulse_cnt, int analog_voltage, ulong millis);
     static void DeleteAll(Node* head);
@@ -36,8 +36,8 @@ public:
 
     static bool IsValid(const Message &msg);
 
+    Message(char prefix, int code, String data) : prefix(prefix), code(code), data(data) {};
     Message(String msg);
-    Message(char prefix, int code, String data);
     Message(float speed, float voltage);
     Message();
     String ToString() const;

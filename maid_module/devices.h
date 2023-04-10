@@ -12,8 +12,8 @@
 class BluetoothAdapter
 {
 public:
-    static void TransferMessage(const Message &msg, const AltSoftSerial &BtSerial);
-    static Message RecieveMessage(const AltSoftSerial &BtSerial);
+    static void TransferMessage(const Message &msg, AltSoftSerial &BtSerial);
+    static Message RecieveMessage(AltSoftSerial &BtSerial);
 };
 
 // * Provides work with speed calculation
@@ -21,8 +21,9 @@ class Speedometer
 {
 private:
     uint impulse_counter;
+    
 public:
-    Speedometer();
+    Speedometer() : impulse_counter(0) {};
     float CalculateSpeed(float time_spent_sec, const Wheel &wheel) const;
     int GetImpulseCount() const;
     void CountImpulse();
@@ -34,10 +35,12 @@ class Voltmeter
 {
 private:
     byte max_voltage;
-public:
-    static const float minimal_reading_value = 0.0f;
     
-    Voltmeter(byte max_voltage);
+public:
+    static constexpr float minimal_reading_value = 0.0f;
+    static constexpr float correction_factor = 1.0347f;
+    
+    Voltmeter(byte max_voltage) : max_voltage(max_voltage) {};
     byte GetMaxVoltage() const;
     float CalculateVoltage(int analog_read_result) const;
 };
@@ -49,13 +52,14 @@ private:
     byte led_pin;
     bool is_shining;
     float reaction_interval_sec;
+    
 public:
     Timer ChangeStateTimer; 
     
-    Signal(byte led_pin, float delay_sec, bool enabled, float reaction_interval_sec=1.0f);
+    Signal(byte led_pin, float delay_sec, bool enabled, float reaction_interval_sec);
     bool IsInReactionInterval(ulong time) const;
     void TryBlink();
-    void BlinkForever(float multiplier=1.0f) const;
+    void BlinkForever(float multiplier) const;
 };
 
 // * Provides work with files (sd-card)
@@ -66,6 +70,7 @@ private:
     String date_time;
     String readings_filename;
     ulong last_write_time;
+    
 public:
     DataSaver(String readings_filename);
     ulong GetLastWriteTime() const;

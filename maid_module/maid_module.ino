@@ -1,11 +1,11 @@
 /*
   Project: MaidModule
   Developer: Ggorets0dev
-  Version: 0.16.2
+  Version: 0.17.0
   GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.16.2"
+#define __MODULE_VERSION__ "0.17.0"
 
 
 #include <Arduino.h>
@@ -26,20 +26,21 @@ Reading last_reading;
 Message msg_temp;
 
 // NOTE - Setting up transfer ports
-const HardwareSerial &UsbSerial = Serial; 
-const AltSoftSerial BtSerial;
+HardwareSerial &UsbSerial = Serial; 
+AltSoftSerial BtSerial;
 
 // NOTE - Variables for LED indicator feeds
-const Signal LeftTurning(LEFT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false);
-const Signal RightTurning(RIGHT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false);
-const Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false);
-const Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
+Signal LeftTurning(LEFT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false, 1.0f);
+Signal RightTurning(RIGHT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false, 1.0f);
+Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false, 1.0f);
+Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 
 // NOTE - Setting up to transmit and save readings
 bool is_initialized = false;
-const Timer SendReadingsTimer(static_cast<float>(SEND_DELAY_SEC));
-const Timer SaveReadingsTimer(static_cast<float>(SAVE_DELAY_SEC));
-const DataSaver SdCard("data.txt");
+Timer SendReadingsTimer(static_cast<float>(SEND_DELAY_SEC));
+Timer SaveReadingsTimer(static_cast<float>(SAVE_DELAY_SEC));
+DataSaver SdCard("data.txt");
+Logger EventLogger(UsbSerial);
 MillisTracker millis_passed;
 Sd2Card card;
 SdVolume volume;
@@ -50,9 +51,9 @@ uint Node::node_cnt = 0;
 Node* head = nullptr;
 
 // NOTE - Setting up devices to receive and calculate data
-const Wheel FrontWheel(WHEEL_SPOKES_CNT, WHEEL_CIRCUMFERENCE_MM);
-const Voltmeter VoltageSensor(MAX_VOLTAGE_V);
-const Speedometer SpeedSensor;
+Wheel FrontWheel(WHEEL_SPOKES_CNT, WHEEL_CIRCUMFERENCE_MM);
+Voltmeter VoltageSensor(MAX_VOLTAGE_V);
+Speedometer SpeedSensor;
 
 // SECTION - Interruption handlers
 void ChangeStateLeftTurn()
@@ -62,7 +63,7 @@ void ChangeStateLeftTurn()
     else
         LeftTurning.ChangeStateTimer.Enable();
 
-    Logger::LogTurnStateChanged("LEFT");
+    EventLogger.LogTurnStateChanged("LEFT");
 }
 void ChangeStateRightTurn()
 {             
@@ -71,7 +72,7 @@ void ChangeStateRightTurn()
     else
         RightTurning.ChangeStateTimer.Enable();
 
-    Logger::LogTurnStateChanged("RIGHT");
+    EventLogger.LogTurnStateChanged("RIGHT");
 }
 void CountImpulse() 
 { 
@@ -108,7 +109,7 @@ void setup()
     SD.begin(ROM_DATA_PIN);
 
     if (!Memory::InitializeRom(card, volume, root) || Memory::GetFreeRom(volume) < Memory::minimal_free_rom_size)
-        ErrorOccuring.BlinkForever();
+        ErrorOccuring.BlinkForever(1.0f);
 }
 
 void loop() 
@@ -132,7 +133,7 @@ void loop()
             SdCard.WriteNodes(head);
             Node::DeleteAll(head);
 
-            Logger::LogReadingsSaved();
+            EventLogger.LogReadingsSaved();
         }
 
         SpeedSensor.ResetCounter(); 
@@ -148,7 +149,7 @@ void loop()
          
         SendReadingsTimer.ResetTime();
         
-        Logger::LogMsgSent();
+        EventLogger.LogMsgSent();
     }
     // !SECTION
 
@@ -175,25 +176,25 @@ void loop()
             if (SdCard.TrySetDateTime(msg_temp.data))
             {
                 SdCard.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
-                millis_passed.initialization_time_ms = millis();
+                millis_passed.SetMark(millis());
                 
                 if (!is_initialized)
                 {                    
                     msg_temp = Message(MessageAnalyzer::MessagePrefixes::RESPONSE, MessageAnalyzer::MessageCodes::MODULE_VERSION_ENTRY, __MODULE_VERSION__);
                     BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
 
-                    Logger::LogMsgSent();
+                    EventLogger.LogMsgSent();
                 }
                 else if (Node::node_cnt != 0)
                 {
                     Node::DeleteAll(head);
                 }
 
-                Logger::LogHeaderSaved();
+                EventLogger.LogHeaderSaved();
             }
         }
         
-        Logger::LogMsgRecived();
+        EventLogger.LogMsgRecived();
     }
     // !SECTION
 
