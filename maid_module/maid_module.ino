@@ -1,11 +1,11 @@
 /*
   Project: MaidModule
   Developer: Ggorets0dev
-  Version: 0.17.0
+  Version: 0.17.1
   GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.17.0"
+#define __MODULE_VERSION__ "0.17.1"
 
 
 #include <Arduino.h>
@@ -39,7 +39,7 @@ Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 bool is_initialized = false;
 Timer SendReadingsTimer(static_cast<float>(SEND_DELAY_SEC));
 Timer SaveReadingsTimer(static_cast<float>(SAVE_DELAY_SEC));
-DataSaver SdCard("data.txt");
+DataSaver SdCard("DATA.TXT");
 Logger EventLogger(UsbSerial);
 MillisTracker millis_passed;
 Sd2Card card;

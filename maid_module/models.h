@@ -13,7 +13,7 @@ class Node
 {
 public:
     static uint node_cnt;
-    static constexpr uint max_node_cnt = 15; // ! Memory consumption is directly related to this amount
+    static constexpr uint max_node_cnt = 10; // ! Data may not be saved if memory consumption is too high
     int impulse_cnt;
     int analog_voltage;
     ulong time;

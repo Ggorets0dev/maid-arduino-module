@@ -53,19 +53,23 @@ bool DataSaver::TrySetDateTime(String date_time)
 void DataSaver::WriteNodes(Node* head)
 {
     File readings_file = SD.open(this->readings_filename, FILE_WRITE);
-    
+
     Node* current = head;
     String reading;
-    while (current != nullptr)
-    {
-        reading = "{R} " + String(current->time) + " | " + String(current->impulse_cnt) + " | " + String(current->analog_voltage);
-        readings_file.println(reading);
-        current = current->next;
-    }
 
-    readings_file.close();
+    if (!readings_file)
+      return;
 
-    this->last_write_time = millis();
+      while (current != nullptr)
+      {
+          reading = "{R} " + String(current->time) + " | " + String(current->impulse_cnt) + " | " + String(current->analog_voltage);
+          readings_file.println(reading);
+          current = current->next;
+      }
+
+      readings_file.close();
+
+      this->last_write_time = millis();
 }
 
 // * Create header of readings in file
@@ -74,8 +78,12 @@ void DataSaver::WriteHeader(const Voltmeter &voltmeter, const Wheel &wheel, cons
     const String header = "{H} " + date_time + " ( " + String(wheel.count_of_spokes) + " | " + String(wheel.wheel_circumference_mm) + " | " + String(voltmeter.GetMaxVoltage()) + " | "+ String(save_readings_timer.GetRepeatTime()) + " )";
 
     File readings_file = SD.open(this->readings_filename, FILE_WRITE);
-    readings_file.println(header);
-    readings_file.close();
+    
+    if (readings_file)
+    {
+        readings_file.println(header);
+        readings_file.close();
+    }
 
     this->last_write_time = millis();
 }

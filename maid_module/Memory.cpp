@@ -6,7 +6,7 @@ extern void *__brkval;
 // * Check the availability of the drive
 bool Memory::InitializeRom(Sd2Card &card, SdVolume &volume, SdFile &root)
 { 
-    if (card.init(SPI_HALF_SPEED, ROM_DATA_PIN) || !volume.init(card))
+    if (!card.init(SPI_HALF_SPEED, ROM_DATA_PIN) || !volume.init(card))
         return false;
     else
         return true;
