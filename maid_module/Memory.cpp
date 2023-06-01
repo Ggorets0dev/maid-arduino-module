@@ -6,10 +6,7 @@ extern void *__brkval;
 // * Check the availability of the drive
 bool Memory::InitializeRom(Sd2Card &card, SdVolume &volume, SdFile &root)
 { 
-    if (!card.init(SPI_HALF_SPEED, ROM_DATA_PIN) || !volume.init(card))
-        return false;
-    else
-        return true;
+    return card.init(SPI_HALF_SPEED, ROM_DATA_PIN) && volume.init(card);
 }
 
 // * Get the amount of free dynamic memory
@@ -27,7 +24,7 @@ uint Memory::GetFreeRam()
 // * Get the amount of free static memory
 uint Memory::GetFreeRom(SdVolume &volume)
 {
-    File root = SD.open("/");
+    File root = SD.open(F("/"));
 
     ulong used_space = 0;
     while (true)

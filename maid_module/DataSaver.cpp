@@ -17,6 +17,8 @@ ulong DataSaver::GetLastWriteTime() const
 // * Try to set date of today, get it from app
 bool DataSaver::TrySetDateTime(String date_time)
 {
+  // * Waiting dd.mm.yyyy-HH.MM.ss
+
    if (date_time.length() != DataSaver::date_time_length)
        return false;
 
@@ -25,7 +27,7 @@ bool DataSaver::TrySetDateTime(String date_time)
    { 
        if (date_time[i] == '-')
        {
-           time_inx = i+1;
+           time_inx = i + 1;
            break;
        }
            
@@ -62,8 +64,15 @@ void DataSaver::WriteNodes(Node* head)
 
       while (current != nullptr)
       {
-          reading = "{R} " + String(current->time) + " | " + String(current->impulse_cnt) + " | " + String(current->analog_voltage);
+          reading = F("{R} ");
+          reading += current->time;
+          reading += F(" | ");
+          reading += current->impulse_cnt;
+          reading += F(" | ");
+          reading += current->analog_voltage;
+
           readings_file.println(reading);
+          
           current = current->next;
       }
 
@@ -75,7 +84,17 @@ void DataSaver::WriteNodes(Node* head)
 // * Create header of readings in file
 void DataSaver::WriteHeader(const Voltmeter &voltmeter, const Wheel &wheel, const Timer &save_readings_timer)
 {
-    const String header = "{H} " + date_time + " ( " + String(wheel.count_of_spokes) + " | " + String(wheel.wheel_circumference_mm) + " | " + String(voltmeter.GetMaxVoltage()) + " | "+ String(save_readings_timer.GetRepeatTime()) + " )";
+    String header = F("{H} ");
+    header += date_time;
+    header += F(" ( ");
+    header += wheel.count_of_spokes;
+    header += F(" | ");
+    header += wheel.wheel_circumference_mm;
+    header += F(" | ");
+    header += voltmeter.GetMaxVoltage();
+    header += F(" | ");
+    header += save_readings_timer.GetRepeatTime();
+    header += F(" )");
 
     File readings_file = SD.open(this->readings_filename, FILE_WRITE);
     

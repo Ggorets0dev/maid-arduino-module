@@ -2,7 +2,11 @@
 
 void Logger::LogTurnStateChanged(const char* turn)
 {
-    const String log = String(turn) + " TURN STATE CHANGED";
+    String log; 
+    log.reserve(25);
+
+    log = turn;
+    log += F(" TURN STATE CHANGED");
     this->LogSerial.println(MakeLog(log));
 }
 
@@ -28,8 +32,11 @@ void Logger::LogHeaderSaved()
 
 String Logger::MakeLog(String log)
 {
-    const String time_passed = String(millis());
-    const String full_log = "[LOG] " + log + " (" + time_passed + " ms)";
+    String full_log = F("[LOG] ");
+    full_log += log;
+    full_log += F(" (");
+    full_log += millis();
+    full_log += F(" ms)");
 
     return full_log;
 }

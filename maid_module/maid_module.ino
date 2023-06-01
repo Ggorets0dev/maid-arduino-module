@@ -1,11 +1,11 @@
 /*
   Project: MaidModule
   Developer: Ggorets0dev
-  Version: 0.17.1
+  Version: 0.17.2
   GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.17.1"
+#define __MODULE_VERSION__ "0.17.2"
 
 
 #include <Arduino.h>
@@ -105,7 +105,8 @@ void setup()
         RightTurning.ChangeStateTimer.Enable();
     // !SECTION
 
-    UsbSerial.begin(BAUD); BtSerial.begin(BAUD);
+    UsbSerial.begin(BAUD); 
+    BtSerial.begin(BAUD);
     SD.begin(ROM_DATA_PIN);
 
     if (!Memory::InitializeRom(card, volume, root) || Memory::GetFreeRom(volume) < Memory::minimal_free_rom_size)

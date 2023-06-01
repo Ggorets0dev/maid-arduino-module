@@ -3,15 +3,18 @@
 Message::Message(String msg)
 {
     this->prefix = msg[0];
-    this->code = msg.substring(msg.indexOf("{") + 1, msg.indexOf("}")).toInt();
-    this->data = msg.substring(msg.indexOf("}") + 1, msg.indexOf(";"));
+    this->code = msg.substring(msg.indexOf('{') + 1, msg.indexOf('}')).toInt();
+    this->data = msg.substring(msg.indexOf('}') + 1, msg.indexOf(';'));
 }
 
 Message::Message(float speed, float voltage)
 {
     this->prefix = MessageAnalyzer::MessagePrefixes::RESPONSE;
     this->code = MessageAnalyzer::MessageCodes::SENSOR_READING_ENTRY;
-    this->data = String(speed, 2) + "_" + String(voltage, 2);
+    
+    this->data = String(speed, 2) + 
+    this->data += F("_");
+    this->data += String(voltage, 2);
 }
 
 Message::Message() 
@@ -23,7 +26,14 @@ Message::Message()
 
 String Message::ToString() const
 {
-    return String(prefix) + "{" + String(code) + "}" + data + ";";
+    String message = String(this->prefix);
+    message += F("{");
+    message += this->code;
+    message += F("}");
+    message += this->data;
+    message += F(";");
+
+    return message;
 }
 
 // * Check if the message matches the template 
