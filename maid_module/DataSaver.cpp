@@ -23,7 +23,7 @@ bool DataSaver::TrySetDateTime(String date_time)
        return false;
 
    int time_inx;
-   for (int i(0); i < date_time.length(); i++)
+   for (byte i(0); i < date_time.length(); i++)
    { 
        if (date_time[i] == '-')
        {
@@ -38,7 +38,7 @@ bool DataSaver::TrySetDateTime(String date_time)
            return false;
    }
    
-   for (int i(time_inx); i < date_time.length(); i++)
+   for (byte i(time_inx); i < date_time.length(); i++)
    {
        if ((i == time_inx + 2 || i == time_inx + 5) && (date_time[i] != ':'))
            return false;
@@ -52,7 +52,7 @@ bool DataSaver::TrySetDateTime(String date_time)
 }
 
 // * Write all readings to file
-void DataSaver::WriteNodes(Node* head)
+bool DataSaver::WriteNodes(Node* head)
 {
     File readings_file = SD.open(this->readings_filename, FILE_WRITE);
 
@@ -60,29 +60,31 @@ void DataSaver::WriteNodes(Node* head)
     String reading;
 
     if (!readings_file)
-      return;
+      return false;
 
-      while (current != nullptr)
-      {
-          reading = F("{R} ");
-          reading += current->time;
-          reading += F(" | ");
-          reading += current->impulse_cnt;
-          reading += F(" | ");
-          reading += current->analog_voltage;
+    while (current != nullptr)
+    {
+        reading = F("{R} ");
+        reading += current->time;
+        reading += F(" | ");
+        reading += current->impulse_cnt;
+        reading += F(" | ");
+        reading += current->analog_voltage;
 
-          readings_file.println(reading);
-          
-          current = current->next;
-      }
+        readings_file.println(reading);
+        
+        current = current->next;
+    }
 
-      readings_file.close();
+    readings_file.close();
 
-      this->last_write_time = millis();
+    this->last_write_time = millis();
+
+    return true;
 }
 
 // * Create header of readings in file
-void DataSaver::WriteHeader(const Voltmeter &voltmeter, const Wheel &wheel, const Timer &save_readings_timer)
+bool DataSaver::WriteHeader(const Voltmeter &voltmeter, const Wheel &wheel, const Timer &save_readings_timer)
 {
     String header = F("{H} ");
     header += date_time;
@@ -98,11 +100,13 @@ void DataSaver::WriteHeader(const Voltmeter &voltmeter, const Wheel &wheel, cons
 
     File readings_file = SD.open(this->readings_filename, FILE_WRITE);
     
-    if (readings_file)
-    {
-        readings_file.println(header);
-        readings_file.close();
-    }
+    if (!readings_file)
+      return false;
+
+    readings_file.println(header);
+    readings_file.close();
 
     this->last_write_time = millis();
+
+    return true;
 }

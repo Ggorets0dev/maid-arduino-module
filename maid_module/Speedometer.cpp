@@ -13,7 +13,7 @@ void Speedometer::ResetCounter()
 }
 
 // * Get the number of counted pulses
-int Speedometer::GetImpulseCount() const
+byte Speedometer::GetImpulseCount() const
 {
     return this->impulse_counter;
 }

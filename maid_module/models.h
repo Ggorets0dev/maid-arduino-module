@@ -12,16 +12,16 @@ class MessageAnalyzer;
 class Node
 {
 public:
-    static uint node_cnt;
-    static constexpr uint max_node_cnt = 10; // ! Data may not be saved if memory consumption is too high
-    int impulse_cnt;
-    int analog_voltage;
+    static byte node_cnt;
+    static constexpr byte max_node_cnt = 10; // ! Data may not be saved if memory consumption is too high
+    byte impulse_cnt;
+    uint analog_voltage;
     ulong time;
     Node* next;
 
-    Node(int impulse_cnt, int analog_voltage, ulong millis) : impulse_cnt(impulse_cnt), analog_voltage(analog_voltage), time(millis), next(nullptr) {};
-    static Node* CreateHead(int impulse_cnt, int analog_voltage, ulong millis);
-    static void Insert(Node* head, int impulse_cnt, int analog_voltage, ulong millis);
+    Node(byte impulse_cnt, uint analog_voltage, ulong millis) : impulse_cnt(impulse_cnt), analog_voltage(analog_voltage), time(millis), next(nullptr) {};
+    static Node* CreateHead(byte impulse_cnt, uint analog_voltage, ulong millis);
+    static void Insert(Node* head, byte impulse_cnt, uint analog_voltage, ulong millis);
     static void DeleteAll(Node* head);
 };
 
@@ -29,14 +29,14 @@ public:
 class Message
 {
 public:
-    static const uint maximal_message_length = 25;
+    static const byte maximal_message_length = 25;
     char prefix;
-    int code;
+    byte code;
     String data;
 
     static bool IsValid(const Message &msg);
 
-    Message(char prefix, int code, String data) : prefix(prefix), code(code), data(data) {};
+    Message(char prefix, byte code, String data) : prefix(prefix), code(code), data(data) {};
     Message(String msg);
     Message(float speed, float voltage);
     Message();
@@ -55,8 +55,8 @@ struct Wheel
 // * Measured speed and voltages and their initial variants
 struct Reading
 {
-    int impulse_cnt = 0;
-    int analog_voltage = 0;
+    byte impulse_cnt = 0;
+    uint analog_voltage = 0;
     float speed_kmh = 0.0f;
     float voltage_v = 0.0f;
 };

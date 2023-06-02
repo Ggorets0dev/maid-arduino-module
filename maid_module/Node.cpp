@@ -1,7 +1,7 @@
 #include "models.h"
 
 // * Create head of linked list
-Node* Node::CreateHead(int impulse_cnt, int analog_voltage, ulong millis)
+Node* Node::CreateHead(byte impulse_cnt, uint analog_voltage, ulong millis)
 {
     Node* head = new Node(impulse_cnt, analog_voltage, millis);
     node_cnt++;
@@ -10,7 +10,7 @@ Node* Node::CreateHead(int impulse_cnt, int analog_voltage, ulong millis)
 }
 
 // * Insert Node in linked list
-void Node::Insert(Node* head, int impulse_cnt, int analog_voltage, ulong millis)
+void Node::Insert(Node* head, byte impulse_cnt, uint analog_voltage, ulong millis)
 {    
     Node* current = head;
     Node* node_to_insert = new Node(impulse_cnt, analog_voltage, millis);

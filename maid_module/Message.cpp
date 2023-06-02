@@ -1,6 +1,6 @@
 #include "models.h"
 
-Message::Message(String msg)
+Message::Message(const String msg)
 {
     this->prefix = msg[0];
     this->code = msg.substring(msg.indexOf('{') + 1, msg.indexOf('}')).toInt();
@@ -12,7 +12,7 @@ Message::Message(float speed, float voltage)
     this->prefix = MessageAnalyzer::MessagePrefixes::RESPONSE;
     this->code = MessageAnalyzer::MessageCodes::SENSOR_READING_ENTRY;
     
-    this->data = String(speed, 2) + 
+    this->data = String(speed, 2);
     this->data += F("_");
     this->data += String(voltage, 2);
 }

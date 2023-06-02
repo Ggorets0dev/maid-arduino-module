@@ -1,11 +1,11 @@
 /*
   Project: MaidModule
   Developer: Ggorets0dev
-  Version: 0.17.2
+  Version: 0.17.3
   GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.17.2"
+#define __MODULE_VERSION__ "0.17.3"
 
 
 #include <Arduino.h>
@@ -47,7 +47,7 @@ SdVolume volume;
 SdFile root;
 
 // NOTE - Setting up a single-link list for storing information
-uint Node::node_cnt = 0;
+byte Node::node_cnt = 0;
 Node* head = nullptr;
 
 // NOTE - Setting up devices to receive and calculate data
@@ -110,7 +110,7 @@ void setup()
     SD.begin(ROM_DATA_PIN);
 
     if (!Memory::InitializeRom(card, volume, root) || Memory::GetFreeRom(volume) < Memory::minimal_free_rom_size)
-        ErrorOccuring.BlinkForever(1.0f);
+        ErrorOccuring.BlinkForever(1.0f); // ! Loop stops forever
 }
 
 void loop() 
@@ -131,7 +131,11 @@ void loop()
 
         if (Node::node_cnt >= Node::max_node_cnt || Memory::GetFreeRam() < Memory::minimal_free_ram_size)
         {
-            SdCard.WriteNodes(head);
+            bool success = SdCard.WriteNodes(head);
+
+            if (!success)
+                ErrorOccuring.BlinkForever(2.0f); // ! Loop stops forever
+
             Node::DeleteAll(head);
 
             EventLogger.LogReadingsSaved();
@@ -176,7 +180,11 @@ void loop()
         {   
             if (SdCard.TrySetDateTime(msg_temp.data))
             {
-                SdCard.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
+                bool success = SdCard.WriteHeader(VoltageSensor, FrontWheel, SaveReadingsTimer);
+
+                if (!success)
+                    ErrorOccuring.BlinkForever(2.0f); // ! Loop stops forever
+
                 millis_passed.SetMark(millis());
                 
                 if (!is_initialized)
