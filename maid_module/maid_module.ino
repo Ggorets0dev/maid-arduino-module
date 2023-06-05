@@ -1,11 +1,11 @@
 /*
   Project: MaidModule
   Developer: Ggorets0dev
-  Version: 0.17.3
+  Version: 0.17.4
   GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.17.3"
+#define __MODULE_VERSION__ "0.17.4"
 
 
 #include <Arduino.h>
@@ -32,7 +32,7 @@ AltSoftSerial BtSerial;
 // NOTE - Variables for LED indicator feeds
 Signal LeftTurning(LEFT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false, 1.0f);
 Signal RightTurning(RIGHT_TURN_LAMP_PIN, static_cast<float>(TURN_SIGNAL_FLASH_DELAY_SEC), false, 1.0f);
-Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.5f, false, 1.0f);
+Signal ErrorOccuring(ERROR_SIGNAL_PIN, 0.0f, false, 0.0f);
 Signal SdCardSaving(ROM_SIGNAL_PIN, 0.20f, false, 2.0f);
 
 // NOTE - Setting up to transmit and save readings

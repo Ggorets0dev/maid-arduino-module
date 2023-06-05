@@ -1,7 +1,7 @@
 #include "devices.h"
 
 // * Creating Signal class with it's blink settings
-Signal::Signal(byte led_pin, float delay_sec, bool enabled, float reaction_interval_sec=1.0f)
+Signal::Signal(byte led_pin, float delay_sec, bool enabled, float reaction_interval_sec)
 {
     this->led_pin = led_pin;
     this->is_shining = false;
@@ -44,9 +44,9 @@ void Signal::TryBlink()
 }
 
 // * Transition to infinite blink to indicate a critical situation
-void Signal::BlinkForever(float multiplier) const
+void Signal::BlinkForever(float delay_sec) const
 {
-	  const float delay_ms = this->ChangeStateTimer.GetRepeatTime() * multiplier * 1000.0f;
+	  const float delay_ms = delay_sec * 1000.0f;
     while (true)
     {
         digitalWrite(led_pin, HIGH);

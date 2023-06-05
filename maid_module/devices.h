@@ -59,7 +59,7 @@ public:
     Signal(byte led_pin, float delay_sec, bool enabled, float reaction_interval_sec);
     bool IsInReactionInterval(ulong time) const;
     void TryBlink();
-    void BlinkForever(float multiplier) const;
+    void BlinkForever(float delay_sec) const;
 };
 
 // * Provides work with files (sd-card)
