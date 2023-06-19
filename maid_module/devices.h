@@ -8,12 +8,16 @@
 #include "typedefs.h"
 
 
-// * Provides work with bluetooth connection
-class BluetoothAdapter
+// * Provides work with altsoftserial connection
+class SoftSerialAdapter
 {
+private:
+    AltSoftSerial &SoftSerial;
+
 public:
-    static void TransferMessage(const Message &msg, AltSoftSerial &BtSerial);
-    static Message RecieveMessage(AltSoftSerial &BtSerial);
+    SoftSerialAdapter(AltSoftSerial &SoftSerial) : SoftSerial(SoftSerial) {}
+    void TransferMessage(const Message &msg);
+    Message RecieveMessage();
 };
 
 // * Provides work with speed calculation

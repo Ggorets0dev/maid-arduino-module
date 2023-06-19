@@ -1,11 +1,11 @@
 /*
   Project: MaidModule
   Developer: Ggorets0dev
-  Version: 0.17.4
+  Version: 0.17.5
   GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.17.4"
+#define __MODULE_VERSION__ "0.17.5"
 
 
 #include <Arduino.h>
@@ -40,6 +40,7 @@ bool is_initialized = false;
 Timer SendReadingsTimer(static_cast<float>(SEND_DELAY_SEC));
 Timer SaveReadingsTimer(static_cast<float>(SAVE_DELAY_SEC));
 DataSaver SdCard("DATA.TXT");
+SoftSerialAdapter BluetoothAdapter(BtSerial);
 Logger EventLogger(UsbSerial);
 MillisTracker millis_passed;
 Sd2Card card;
@@ -150,7 +151,7 @@ void loop()
     if (SendReadingsTimer.IsPassed() && SendReadingsTimer.IsEnabled() && is_initialized) 
     { 
         msg_temp = Message(last_reading.speed_kmh, last_reading.voltage_v);
-        BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
+        BluetoothAdapter.TransferMessage(msg_temp);
          
         SendReadingsTimer.ResetTime();
         
@@ -161,7 +162,7 @@ void loop()
     // SECTION - Processing of signals from the control device
     if (BtSerial.available())
     {
-        msg_temp = BluetoothAdapter::RecieveMessage(BtSerial);
+        msg_temp = BluetoothAdapter.RecieveMessage();
         
         if (!Message::IsValid(msg_temp))
             msg_temp = Message();
@@ -190,7 +191,7 @@ void loop()
                 if (!is_initialized)
                 {                    
                     msg_temp = Message(MessageAnalyzer::MessagePrefixes::RESPONSE, MessageAnalyzer::MessageCodes::MODULE_VERSION_ENTRY, __MODULE_VERSION__);
-                    BluetoothAdapter::TransferMessage(msg_temp, BtSerial);
+                    BluetoothAdapter.TransferMessage(msg_temp);
 
                     EventLogger.LogMsgSent();
                 }
