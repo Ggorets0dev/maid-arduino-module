@@ -17,7 +17,7 @@ ulong DataSaver::GetLastWriteTime() const
 // * Try to set date of today, get it from app
 bool DataSaver::TrySetDateTime(String date_time)
 {
-  // * Waiting dd.mm.yyyy-HH.MM.ss
+  // * Waiting dd.mm.yyyy-hh:mm:ss
 
    if (date_time.length() != DataSaver::date_time_length)
        return false;

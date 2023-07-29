@@ -1,18 +1,16 @@
 # MaidModule (Arduino)
 
-Module based on the Arduino made with C++, which collects motorcycle data and partially controls peripherals. It is controlled by a special [MaidApp](https://github.com/Ggorets0dev/maid-android-application) *(Motorcycle Auxiliary Information Device)* written for Android.
+Module based on the Arduino Nano made with C++, which collects motorcycle data and partially controls peripherals. It is controlled by a special [MaidApp](https://github.com/Ggorets0dev/maid-android-application) written for Android.
 
 <p align='center'>
-    <img height=225 src="pics/Maid_Logo_icon.png"/>
+    <img height=225 src="src/img/maid_logo.png"/>
 </p>
 
 ## Installation
 
----
-
 ### **Libraries**
 
-> **Warning:** All of the specified libraries must be loaded manually and be visible in the program for downloading sketches. They must also be available at the time of writing the sketch on board.
+> **Warning:** All of the specified libraries must be loaded manually and be visible in the program for downloading sketches. They must also be available at the time of writing the sketch on board
 
 List of third-party libraries used in the sketch:
 
@@ -21,19 +19,57 @@ List of third-party libraries used in the sketch:
   
 ### **Manual**
 
-Download the source code and, without changing the project structure, load the **maid_module.ino** sketch onto the board. All header files will be loaded automatically.
+> **Note:** It is recommended to use Arduino IDE for comfortable compilation and loading
+
+To download the sketch to your Arduino Nano, follow the steps below:
+
+1) Download the source code from the GitHub page using git clone or ZIP archive
+2) Download the libraries listed in the manual manually or using the Arduino IDE interface
+3) Add libraries to the sketch visibility field by adding files to the required directories (If downloaded manually)
+4) Load the sketch (file **maid_module.ino**) using the built-in functions of the Arduino IDE
+
+## Assembly
+
+### **Board pinout**
+
+Board has a two-story appearance:
+
+
+<img height=375 src="src/img/1_level_board_layout.png"/>
+
+*First level of the scheme*
+
+<img height=375 src="src/img/2_level_board_layout.png"/>
+
+*Second level of the scheme*
+
+Complete board pinout is available in the file board **layout 29.07.2023.lay** file (made in the "Sprint Layout" program)
 
 ## Connection (Bluetooth)
 
----
-
 ### **Transfer messages (Sent/Received)**
 
-You can find a table with all the possible messages on the [MaidApp](https://github.com/Ggorets0dev/maid-android-application/blob/master/README.md) page in the section **Transfer messages (Sent/Received)**.
+> **Warning**: Always check that the command codes of the module and the [application](https://github.com/Ggorets0dev/maid-android-application) match when trying to bind, unless you take an official pair. If the codes do not match, it is guaranteed that the binding will not work correctly, because the commands will be interpreted differently on both devices
+
+Messages always start with a **prefix (# $ ?)**, contains **code ( 0 - 6 )** and end with a **separator ( ; )**.
+
+Available prefixes:
+
+* **$** - Command
+* **\#** - Entry
+* **?** - Empty (no purpose)
+
+Title | Code Value | Prefix | Direction (A - app / M - module) | Template | Description | Example |
+|:--------|:--------:|:---:|:-------:|:-------:|:------------|:--------|
+| EmptyCode | `0` | `?` | A <-> M | - | Empty message that is created by the constructor to just initialize the variable | - |
+| SensorReadingEntry | `1` | `#` | M -> A | speed_voltage | Measured motorcycle speed and battery voltage | #{1}30.15_60.25; |
+| StartSensorReadings | `2` | `$` | A -> M | - | Request to start sending sensor readings | - |
+| StopSensorReadings | `3` | `$` | A -> M | - | Request to stop sending sensor readings | - |
+| ModuleVersionEntry | `4` | `#` | M -> А | major.minor.patch | Requesting a version of a module | #{4}1.2.3; |
+| CurrentDatetimeEntry | `5` | `#` | A -> M | dd.mm.yyyy-hh:mm:ss | Data on date and time of initialization (with [MaidApp](https://github.com/Ggorets0dev/maid-android-application)) | #{7}29.07.2023-15:30:45; |
+| LaunchModule | `6` | `$` | A -> M | - | Start sensor operation | - |
 
 ## Error indicator
-
----
 
 When an error occurs in the operation of the sketch, the special yellow LED starts blinking. The interval between the state changes signals a certain error.
 
@@ -44,6 +80,4 @@ When an error occurs in the operation of the sketch, the special yellow LED star
 
 ## Coursework
 
----
-
-This software (only this repository) was exhibited as a coursework in the 2nd year of the 1st semester of 09.03.03 "Applied Computer Science" in the discipline "Computer Science" at the Moscow Institute of Electronic Technology. All files related to the coursework can be found in a separate folder with the same name.
+This software (only this repository) was exhibited as a coursework in the 2nd year of the 1st semester of 09.03.03 "Applied Computer Science" in the discipline "Computer Science" at the Moscow Institute of Electronic Technology (MIET). All files related to the coursework can be found in a separate folder with the same name.

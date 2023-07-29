@@ -1,11 +1,11 @@
 /*
   Project: MaidModule
   Developer: Ggorets0dev
-  Version: 0.17.5
+  Version: 0.17.6
   GitHub: https://github.com/Ggorets0dev/maid-arduino-module
 */
 
-#define __MODULE_VERSION__ "0.17.5"
+#define __MODULE_VERSION__ "0.17.6"
 
 
 #include <Arduino.h>

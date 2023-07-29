@@ -28,7 +28,7 @@ public:
         STOP_SENSOR_READINGS_CMD = 3,
         MODULE_VERSION_ENTRY = 4,
         CURRENT_DATETIME_ENTRY = 5,
-		    LAUNCH_MODULE_CMD = 7
+	    LAUNCH_MODULE_CMD = 6
     };
 
     /* Codes for development
