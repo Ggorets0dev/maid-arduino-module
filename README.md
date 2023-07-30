@@ -23,16 +23,16 @@ List of third-party libraries used in the sketch:
 
 To download the sketch to your Arduino Nano, follow the steps below:
 
-1) Download the source code from the GitHub page using git clone or ZIP archive
+1) Download the source code from the GitHub page using `git clone` or ZIP-archive
 2) Download the libraries listed in the manual manually or using the Arduino IDE interface
 3) Add libraries to the sketch visibility field by adding files to the required directories (If downloaded manually)
-4) Load the sketch (file **maid_module.ino**) using the built-in functions of the Arduino IDE
+4) Load the sketch (**maid_module.ino**) using the built-in functions of the Arduino IDE
 
 ## Assembly
 
-### **Board pinout**
+### **Board layout**
 
-Board has a two-story appearance:
+Board has a two-level appearance:
 
 
 <img height=375 src="src/img/1_level_board_layout.png"/>
@@ -43,7 +43,18 @@ Board has a two-story appearance:
 
 *Second level of the scheme*
 
-Complete board pinout is available in the file board **layout 29.07.2023.lay** file (made in the "Sprint Layout" program)
+Complete board layout is available in the file **board_layout_29.07.2023.lay** file (made in the "Sprint Layout" program)
+
+### **Memory** (SD-card)
+
+> **Note:** Sketch was tested on the parameters specified in the section. Other parameters may be suitable if they meet the conditions of the Arduino library working with memory cards
+
+MicroSD memory card must have the following features:
+
+* Filesystem: FAT16 (FAT)
+* Cluster size: 16 KB
+* Volume: 1-2 GB
+
 
 ## Connection (Bluetooth)
 
